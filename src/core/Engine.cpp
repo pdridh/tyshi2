@@ -33,6 +33,7 @@ Engine::Engine(const std::string &title)
       processInput();
       update(FIXED_TIMESTEP);
       accumulatedTime -= FIXED_TIMESTEP;
+      m_runtime += FIXED_TIMESTEP;
     }
     render();
   }
@@ -40,6 +41,18 @@ Engine::Engine(const std::string &title)
 
 bool Engine::init(const std::string &title)
 {
+  if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+  {
+    printf("Engine::init - Failed to init SDL: %s\n", SDL_GetError());
+    return false;
+  }
+
+  if (!IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG))
+  {
+    printf("Engine::init - Failed to initialize IMG_Init: %s\n", IMG_GetError());
+    return false;
+  }
+
   // TODO change how the window size works
   m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, m_windowFlags);
 
@@ -48,8 +61,6 @@ bool Engine::init(const std::string &title)
     printf("Engine::init - Failed to create window: %s\n", SDL_GetError());
     return false;
   }
-
-  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 
   m_renderer = SDL_CreateRenderer(m_window, -1, m_rendererFlags);
 
