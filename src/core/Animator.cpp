@@ -1,11 +1,8 @@
 #include "Animator.h"
 
 Animator::Animator(SDL_Texture *sheet, int animations, Vec2 scale)
+    : m_sheet{sheet}, m_animations{animations, nullptr}, m_scale{scale}, m_currentAnimation{0}
 {
-  m_sheet = sheet;
-  m_animations.reserve(animations);
-  m_animations = {nullptr};
-  m_scale = scale;
 }
 
 void Animator::addAnimation(int id, int startX, int startY,
@@ -36,7 +33,6 @@ void Animator::addAnimation(int id, int startX, int startY,
   newAnimation->angle = angle;
 
   m_animations[id] = newAnimation;
-  m_currentAnimation = m_animations.size() - 1;
 }
 
 void Animator::update(const double dt)
@@ -104,7 +100,7 @@ void Animator::drawAt(Vec2 pos, SDL_Renderer *renderer)
 bool Animator::isAssigned(int id)
 {
   Animation *found = m_animations[id];
-  return (bool)found;
+  return found;
 }
 
 void Animator::reset(int id)
