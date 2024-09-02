@@ -1,20 +1,24 @@
 #include "Animator.h"
 
-void Animator::Animation::reset()
-{
-  frameRect.x = startX * frameRect.w;
-  frameRect.y = startY * frameRect.h;
-}
-
-Animator::Animator(SDL_Texture *sheet)
+Animator::Animator(SDL_Texture *sheet, int animations, Vec2 scale)
 {
   m_sheet = sheet;
+  m_animations.reserve(animations);
+  m_animations = {nullptr};
+  m_scale = scale;
 }
 
-void Animator::addAnimation(int startX, int startY, int frames,
-                            int frameWidth, int frameHeight, double fps,
-                            Vec2 scale, double angle, SDL_RendererFlip flip)
+void Animator::addAnimation(int id, int startX, int startY,
+                            int frames, int frameWidth,
+                            int frameHeight, double fps,
+                            SDL_RendererFlip flip, double angle)
 {
+  if (isAssigned(id))
+  {
+    printf("Animator::addAnimation - ID already assigned to an animation\n");
+    return;
+  }
+
   Animation *newAnimation = new Animation();
   newAnimation->startX = startX;
   newAnimation->startY = startY;
@@ -24,18 +28,15 @@ void Animator::addAnimation(int startX, int startY, int frames,
   newAnimation->frameRect.h = frameHeight;
 
   newAnimation->frames = frames;
-
+  newAnimation->currentFrame = 0;
+  newAnimation->frameTime = 0.0;
   newAnimation->frameDuration = 1 / fps; // calculate duration of each animation from fps
 
-  newAnimation->scale = scale;
-  newAnimation->angle = angle;
   newAnimation->flip = flip;
+  newAnimation->angle = angle;
 
-  m_animations.push_back(newAnimation);
+  m_animations[id] = newAnimation;
   m_currentAnimation = m_animations.size() - 1;
-
-  m_currentAnimFrame = 0;
-  m_currentFrameTime = 0.0;
 }
 
 void Animator::update(const double dt)
@@ -48,14 +49,16 @@ void Animator::update(const double dt)
     return;
   }
 
-  m_currentFrameTime += dt;
-  // Update this animation
   Animation *currentAnim = m_animations[m_currentAnimation];
-  if (m_currentFrameTime >= currentAnim->frameDuration)
+  currentAnim->frameTime += dt;
+  // Update this animation
+  if (currentAnim->frameTime >= currentAnim->frameDuration)
   {
-    m_currentFrameTime = 0;
-    m_currentAnimFrame = (m_currentAnimFrame + 1) % currentAnim->frames;
-    currentAnim->frameRect.x = (currentAnim->startX * currentAnim->frameRect.w) + currentAnim->frameRect.w * m_currentAnimFrame;
+    currentAnim->frameTime = 0;
+    currentAnim->currentFrame++;
+    currentAnim->currentFrame = currentAnim->currentFrame % currentAnim->frames;
+    currentAnim->frameRect.x = (currentAnim->startX * currentAnim->frameRect.w) +
+                               currentAnim->frameRect.w * currentAnim->currentFrame;
   }
 }
 
@@ -67,17 +70,14 @@ void Animator::playAnimation(int id)
     return;
   }
 
-  Animation *found = m_animations[id];
-  if (!found)
+  if (!isAssigned(id))
   {
-    printf("Animation::remove - Tried removing unkown animation\n");
+    printf("Animation::remove - Tried playing unkown animation\n");
     return;
   }
-  found->reset();
 
+  reset(id);
   m_currentAnimation = id;
-  m_currentAnimFrame = 0;
-  m_currentFrameTime = 0.0;
 }
 
 void Animator::drawAt(Vec2 pos, SDL_Renderer *renderer)
@@ -90,8 +90,8 @@ void Animator::drawAt(Vec2 pos, SDL_Renderer *renderer)
   Animation *currentAnim = m_animations[m_currentAnimation];
 
   SDL_FRect dstRect;
-  dstRect.w = currentAnim->frameRect.w * currentAnim->scale.x,
-  dstRect.h = currentAnim->frameRect.h * currentAnim->scale.y;
+  dstRect.w = currentAnim->frameRect.w * m_scale.x,
+  dstRect.h = currentAnim->frameRect.h * m_scale.y;
   dstRect.x = pos.x - (dstRect.w / 2);
   dstRect.y = pos.y - (dstRect.h / 2);
   SDL_FPoint center = {pos.x, pos.y};
@@ -99,4 +99,25 @@ void Animator::drawAt(Vec2 pos, SDL_Renderer *renderer)
   SDL_RenderCopyExF(renderer, m_sheet,
                     &currentAnim->frameRect, &dstRect,
                     currentAnim->angle, &center, currentAnim->flip);
+}
+
+bool Animator::isAssigned(int id)
+{
+  Animation *found = m_animations[id];
+  return (bool)found;
+}
+
+void Animator::reset(int id)
+{
+  if (!isAssigned(id))
+  {
+    printf("Animator::reset - resetting unkown animation (shouldnt be possible)\n");
+    return;
+  }
+
+  Animation *anim = m_animations[id];
+  anim->frameRect.x = anim->startX * anim->frameRect.w;
+  anim->frameRect.y = anim->startY * anim->frameRect.h;
+  anim->currentFrame = 0;
+  anim->frameTime = 0.0;
 }

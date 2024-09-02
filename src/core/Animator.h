@@ -12,27 +12,35 @@ class Animator
 public:
   struct Animation
   {
+    // The rect to draw from the texture (source rect)
     SDL_Rect frameRect;
+    // The x'th number of frame to start from (not in actual pixels but frames)
     int startX;
+    // The y'th number of frame to start from (not in actual pixels but frames)
     int startY;
+    // The number of frames that this animation has
     int frames;
+    // The current frame that is being shown
+    int currentFrame;
+    // The duration of each frame
     double frameDuration;
-    Vec2 scale;
-    double angle;
+    // The time elapsed by the current frame
+    double frameTime;
+    // Flip the animation during rendering
     SDL_RendererFlip flip;
-
-    // Reset animation back to its start
-    void reset();
+    // Angle to rotate this animation with
+    double angle;
   };
 
 public:
   // Constructor currently takes a whole spritesheet (not sure)
-  Animator(SDL_Texture *sheet);
+  Animator(SDL_Texture *sheet, int animations, Vec2 scale = Vec2(1.0, 1.0));
   // Add an animation for the animator to calculate frames with
-  void addAnimation(int startX, int startY,
-                    int frames, int frameWidth, int frameHeight,
-                    double fps = 24, Vec2 scale = Vec2(1.0, 1.0),
-                    double angle = 0.0, SDL_RendererFlip flip = SDL_FLIP_NONE);
+  void addAnimation(int id, int startX, int startY,
+                    int frames, int frameWidth,
+                    int frameHeight, double fps = 24,
+                    SDL_RendererFlip flip = SDL_FLIP_NONE,
+                    double angle = 0.0);
   // Update animation frames + manage animations
   void update(const double dt);
   // Change the current animation
@@ -41,9 +49,14 @@ public:
   void drawAt(Vec2 pos, SDL_Renderer *renderer);
 
 private:
+  // Helper fuction to check if id is assigned
+  bool isAssigned(int id);
+  // Reset an animation back to its start
+  void reset(int id);
+
+private:
+  Vec2 m_scale;
   SDL_Texture *m_sheet;
   int m_currentAnimation;
-  int m_currentAnimFrame;
-  double m_currentFrameTime;
   std::vector<Animation *> m_animations;
 };
