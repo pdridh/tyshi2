@@ -1,14 +1,15 @@
 #include "Animator.h"
 
 Animator::Animator(SDL_Texture *sheet, int animations, Vec2 scale)
-    : m_sheet{sheet}, m_animations{animations, nullptr}, m_scale{scale}, m_currentAnimation{0}
+    : m_sheet{sheet}, m_animations{animations, nullptr},
+      m_scale{scale}, m_currentAnimation{0}, m_renderFlipped{SDL_FLIP_NONE}
 {
 }
 
 void Animator::addAnimation(int id, int startX, int startY,
                             int frames, int frameWidth,
                             int frameHeight, double fps,
-                            SDL_RendererFlip flip, double angle)
+                            double angle)
 {
   if (isAssigned(id))
   {
@@ -29,7 +30,6 @@ void Animator::addAnimation(int id, int startX, int startY,
   newAnimation->frameTime = 0.0;
   newAnimation->frameDuration = 1 / fps; // calculate duration of each animation from fps
 
-  newAnimation->flip = flip;
   newAnimation->angle = angle;
 
   m_animations[id] = newAnimation;
@@ -58,7 +58,7 @@ void Animator::update(const double dt)
   }
 }
 
-void Animator::playAnimation(int id)
+void Animator::playAnimation(int id, SDL_RendererFlip flip)
 {
   // Already playing this animation
   if (id == m_currentAnimation)
@@ -73,6 +73,7 @@ void Animator::playAnimation(int id)
   }
 
   reset(id);
+  m_renderFlipped = flip;
   m_currentAnimation = id;
 }
 
@@ -94,7 +95,7 @@ void Animator::drawAt(Vec2 pos, SDL_Renderer *renderer)
 
   SDL_RenderCopyExF(renderer, m_sheet,
                     &currentAnim->frameRect, &dstRect,
-                    currentAnim->angle, &center, currentAnim->flip);
+                    currentAnim->angle, &center, m_renderFlipped);
 }
 
 bool Animator::isAssigned(int id)

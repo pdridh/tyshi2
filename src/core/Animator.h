@@ -26,8 +26,6 @@ public:
     double frameDuration;
     // The time elapsed by the current frame
     double frameTime;
-    // Flip the animation during rendering
-    SDL_RendererFlip flip;
     // Angle to rotate this animation with
     double angle;
   };
@@ -39,12 +37,11 @@ public:
   void addAnimation(int id, int startX, int startY,
                     int frames, int frameWidth,
                     int frameHeight, double fps = 24,
-                    SDL_RendererFlip flip = SDL_FLIP_NONE,
                     double angle = 0.0);
   // Update animation frames + manage animations
   void update(const double dt);
   // Change the current animation
-  void playAnimation(int id);
+  void playAnimation(int id, SDL_RendererFlip flip = SDL_FLIP_NONE);
   // Draw at the given position (also dunno)
   void drawAt(Vec2 pos, SDL_Renderer *renderer);
 
@@ -57,6 +54,7 @@ private:
 private:
   Vec2 m_scale;
   SDL_Texture *m_sheet;
+  SDL_RendererFlip m_renderFlipped;
   int m_currentAnimation;
   std::vector<Animation *> m_animations;
 };
