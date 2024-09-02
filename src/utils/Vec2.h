@@ -18,9 +18,13 @@ public:
   // Normalizes the vector
   inline Vec2 &normalize()
   {
-    double mag = magnitude();
-    x /= mag;
-    y /= mag;
+    if (x || y)
+    {
+      double mag = magnitude();
+
+      x /= mag;
+      y /= mag;
+    }
 
     return *this;
   }
