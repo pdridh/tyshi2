@@ -61,7 +61,7 @@ void Animator::update(const double dt)
 void Animator::playAnimation(int id, SDL_RendererFlip flip)
 {
   // Already playing this animation
-  if (id == m_currentAnimation)
+  if (id == m_currentAnimation && flip == m_renderFlipped)
   {
     return;
   }
