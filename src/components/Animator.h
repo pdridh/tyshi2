@@ -30,15 +30,16 @@ struct Animation
 
 struct Animator
 {
-  SDL_Texture *m_sheet;
-  std::vector<Animation *> m_animations;
-  Vec2 m_scale;
-  int m_currentAnimation;
-  SDL_RendererFlip m_renderFlipped;
+  SDL_Texture *sheet;
+  std::vector<Animation *> animations;
+  int animationsAdded;
+  Vec2 scale;
+  int currentAnimation;
+  SDL_RendererFlip renderFlipped;
 
-  Animator(SDL_Texture *sheet, int nAnimations, Vec2 scale)
-      : m_sheet{sheet}, m_animations{nAnimations, nullptr},
-        m_scale{scale}, m_currentAnimation{0}, m_renderFlipped{SDL_FLIP_NONE}
+  Animator(SDL_Texture *sheet_arg, int nAnimations_arg, Vec2 scale_arg = Vec2(1.f, 1.f))
+      : sheet{sheet_arg}, animations{nAnimations_arg, nullptr}, animationsAdded{0},
+        scale{scale_arg}, currentAnimation{0}, renderFlipped{SDL_FLIP_NONE}
   {
   }
 
@@ -48,6 +49,7 @@ struct Animator
                     double angle)
   {
     assert(isAssigned(id));
+    assert(animationsAdded < animations.size() - 1);
 
     Animation *newAnimation = new Animation();
     newAnimation->startX = startX;
@@ -64,12 +66,32 @@ struct Animator
 
     newAnimation->angle = angle;
 
-    m_animations[id] = newAnimation;
+    animations[id] = newAnimation;
+    ++animationsAdded;
+  }
+
+  void Animator::playAnimation(int id, SDL_RendererFlip flip)
+  {
+    // Already playing this animation
+    if (id == currentAnimation && flip == renderFlipped)
+    {
+      return;
+    }
+
+    if (!isAssigned(id))
+    {
+      printf("Animation::remove - Tried playing unkown animation\n");
+      return;
+    }
+
+    reset(id);
+    renderFlipped = flip;
+    currentAnimation = id;
   }
 
   bool isAssigned(int id)
   {
-    Animation *found = m_animations[id];
+    Animation *found = animations[id];
     return found;
   }
 
@@ -77,7 +99,7 @@ struct Animator
   {
     assert(!isAssigned(id));
 
-    Animation *anim = m_animations[id];
+    Animation *anim = animations[id];
     anim->frameRect.x = anim->startX * anim->frameRect.w;
     anim->frameRect.y = anim->startY * anim->frameRect.h;
     anim->currentFrame = 0;
