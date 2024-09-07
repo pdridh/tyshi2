@@ -5,6 +5,15 @@
 
 #include <string>
 
+#include "../components/Transform.h"
+#include "../components/Movement.h"
+#include "../components/Sprite.h"
+#include "../components/Controller.h"
+#include "../components/Animator.h"
+
+#include "Input.h"
+#include "ECS.h"
+
 // Main engine class that handles the main loop, window creation and frame speed stuff
 // TODO: lots of changes (eg. read config from file and stuff)
 class Engine
@@ -33,6 +42,9 @@ private:
   int m_rendererFlags;
   SDL_Renderer *m_renderer;
 
+  Input input;
+  ECS ecs;
+
   // Initialize helper function for constructor to init stuff
   bool init(const std::string &window_title);
 
@@ -42,8 +54,17 @@ private:
   // Update game
   void update(double dt);
 
+  // update systems
+  void movementSystem(double dt);
+  void movementAnimationSystem(double dt);
+  void animationSystem(double dt);
+  void controllerSystem(double dt);
+
   // Render frame that clears and swaps buffer each frame
   void render();
   // Main render function for rendering the game
   void renderGame();
+  // render systems
+  void renderSpriteSystem();
+  void renderAnimationSystem();
 };

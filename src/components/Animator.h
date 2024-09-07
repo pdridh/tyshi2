@@ -37,7 +37,7 @@ struct Animator
   int currentAnimation;
   SDL_RendererFlip renderFlipped;
 
-  Animator(SDL_Texture *sheet_arg, int nAnimations_arg, Vec2 scale_arg = Vec2(1.f, 1.f))
+  Animator(SDL_Texture *sheet_arg, size_t nAnimations_arg, Vec2 scale_arg = Vec2(1.f, 1.f))
       : sheet{sheet_arg}, animations{nAnimations_arg, nullptr}, animationsAdded{0},
         scale{scale_arg}, currentAnimation{0}, renderFlipped{SDL_FLIP_NONE}
   {
