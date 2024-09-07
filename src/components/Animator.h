@@ -48,7 +48,7 @@ struct Animator
                     int frameHeight, double fps,
                     double angle = 0.0)
   {
-    assert(isAssigned(id));
+    assert(!isAssigned(id));
     assert(animationsAdded < animations.size() - 1);
 
     Animation *newAnimation = new Animation();
@@ -97,7 +97,7 @@ struct Animator
 
   void reset(int id)
   {
-    assert(!isAssigned(id));
+    assert(isAssigned(id));
 
     Animation *anim = animations[id];
     anim->frameRect.x = anim->startX * anim->frameRect.w;
