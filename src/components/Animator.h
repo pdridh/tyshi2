@@ -46,7 +46,7 @@ struct Animator
   void addAnimation(int id, int startX, int startY,
                     int frames, int frameWidth,
                     int frameHeight, double fps,
-                    double angle)
+                    double angle = 0.0)
   {
     assert(isAssigned(id));
     assert(animationsAdded < animations.size() - 1);
@@ -70,7 +70,7 @@ struct Animator
     ++animationsAdded;
   }
 
-  void Animator::playAnimation(int id, SDL_RendererFlip flip)
+  void playAnimation(int id, SDL_RendererFlip flip = SDL_FLIP_NONE)
   {
     // Already playing this animation
     if (id == currentAnimation && flip == renderFlipped)
