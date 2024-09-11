@@ -11,11 +11,11 @@ public:
   {
   }
 
-  void update(const double dt)
+  void update(const double dt) override final
   {
   }
 
-  void draw(SDL_Renderer *renderer)
+  void draw(SDL_Renderer *renderer) override final
   {
   }
 

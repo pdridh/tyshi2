@@ -8,6 +8,7 @@ add_executable(${app_name}
 src/main.cpp
 src/core/Engine.cpp
 src/ECS/EntityManager.cpp
+src/ECS/components/Animator.cpp
 )
 
 
