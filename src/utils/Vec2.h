@@ -37,6 +37,12 @@ public:
   // Magnitude squared for faster calculations (no sqrt())
   inline double magnitudeSquared() const { return (x * x) + (y * y); }
 
+  // Distance from this vector to a vector
+  inline double distanceTo(const Vec2 &right) const { return (*this - right).magnitude(); }
+
+  // Distance distance from this vector to a vector
+  inline double distanceToSquared(const Vec2 &right) const { return (*this - right).magnitudeSquared(); }
+
   // Scale the vector by a factor
   inline Vec2 &scale(double factor)
   {
