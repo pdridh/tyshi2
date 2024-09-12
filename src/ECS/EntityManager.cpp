@@ -3,8 +3,7 @@
 Entity &EntityManager::addEntity()
 {
   Entity *e(new Entity(*this));
-  std::unique_ptr<Entity> uPtr{e};
-  m_entities.emplace_back(std::move(uPtr));
+  m_addQueue.push_back(e);
   return *e;
 }
 
