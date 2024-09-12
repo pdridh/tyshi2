@@ -39,8 +39,9 @@ public:
     }
   }
 
-  void draw(SDL_Renderer *renderer) override final
+  bool isIdle() const
   {
+    return velocity.x == 0 && velocity.y == 0;
   }
 
 public:
