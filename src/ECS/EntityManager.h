@@ -26,7 +26,7 @@ public:
   // In case manager is destroyed before handing over queued entities to unique_ptr
   ~EntityManager();
 
-private:
+public:
   // For adding entities gracefully without affecting updates
   std::vector<Entity *> m_addQueue;
   // All the entities

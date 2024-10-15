@@ -70,6 +70,42 @@ bool Engine::init(const std::string &title)
     return false;
   }
 
+  SDL_Texture *text = IMG_LoadTexture(m_renderer, "assets/images/knight.png");
+  SDL_Texture *enemText = IMG_LoadTexture(m_renderer, "assets/images/goblin.png");
+
+  Entity &e = manager.addEntity();
+
+  Transform &trans = e.getComponent<Transform>();
+  trans.position = Vec2(200, 300);
+
+  Animator &anim = e.addComponent<Animator>(text, 10);
+  anim.addAnimation(0, 0, 0, 6, 192, 192, 10);
+  anim.addAnimation(1, 0, 1, 6, 192, 192, 10);
+  anim.addAnimation(2, 0, 3, 6, 192, 192, 10);
+
+  Movement &move = e.addComponent<Movement>();
+  move.walkSpeed = Vec2(100, 100);
+
+  e.addComponent<Collider>(50, 50);
+
+  e.addComponent<PlayerScript>(input);
+
+  Entity &enem = manager.addEntity();
+
+  Transform &etrans = enem.getComponent<Transform>();
+  etrans.position = Vec2(400, 100);
+
+  Animator &eanim = enem.addComponent<Animator>(enemText, 10);
+  eanim.addAnimation(0, 0, 0, 7, 192, 192, 10);
+  eanim.addAnimation(1, 0, 1, 6, 192, 192, 10);
+  eanim.addAnimation(2, 0, 2, 6, 192, 192, 10);
+
+  Movement &emove = enem.addComponent<Movement>();
+  emove.walkSpeed = Vec2(50, 50);
+  Collider &ecollide = enem.addComponent<Collider>(100, 100);
+  // anim.addAnimation(1, 0, 1, 6, 192, 192, 10);
+  // anim.addAnimation(2, 0, 3, 6, 192, 192, 10);
+
   return true;
 }
 
@@ -94,11 +130,38 @@ void Engine::processInput()
       break;
     }
   }
+  input.updateKeyState();
 }
 
 void Engine::update(const double dt)
 {
   // Update here
+  // reset manager
+  manager.refresh();
+
+  manager.update(dt);
+
+  for (int i = 0; i < manager.m_entities.size(); ++i)
+  {
+    if (!manager.m_entities[i]->hasComponent<Collider>())
+      continue;
+
+    // Here means it has the component so check others
+    for (int j = i + 1; j < manager.m_entities.size(); ++j)
+    {
+      Collider &iCollider = manager.m_entities[i]->getComponent<Collider>();
+      Collider &jCollider = manager.m_entities[j]->getComponent<Collider>();
+
+      if (iCollider.box.x <= jCollider.box.x + jCollider.box.w &&
+          iCollider.box.x + iCollider.box.w >= jCollider.box.x &&
+          iCollider.box.y <= jCollider.box.y + jCollider.box.h &&
+          iCollider.box.y + iCollider.box.h >= jCollider.box.y)
+      {
+        // iCollider.triggerCollision();
+        jCollider.triggerCollision();
+      }
+    }
+  }
 }
 
 void Engine::render()
@@ -115,4 +178,5 @@ void Engine::render()
 void Engine::renderGame()
 {
   // Draw stuff here
+  manager.draw(m_renderer);
 }
