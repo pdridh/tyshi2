@@ -10,7 +10,6 @@
 #include "../ECS/components/Transform.h"
 #include "../ECS/components/Movement.h"
 #include "../ECS/components/Animator.h"
-#include "../ECS/components/PlayerScript.h"
 #include "../ECS/components/Collider.h"
 #include "../ECS/EntityManager.h"
 

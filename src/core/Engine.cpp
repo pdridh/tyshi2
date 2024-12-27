@@ -65,8 +65,11 @@ bool Engine::init(const std::string &title)
 
 void Engine::processInput()
 {
+
   // Process events
   SDL_Event event;
+
+  input.resetMouse();
 
   while (SDL_PollEvent(&event))
   {
@@ -80,25 +83,33 @@ void Engine::processInput()
       {
         m_running = false;
       }
+    case SDL_MOUSEWHEEL:
+      // event
+      break;
+    case SDL_MOUSEBUTTONUP:
+      input.handleMouseButtonUp(event.button);
+      break;
+    case SDL_MOUSEBUTTONDOWN:
+      input.handleMouseButtonDown(event.button);
+      break;
     default:
       break;
     }
   }
-
-  input.update();
+  input.updateKeyState();
 }
 
 void Engine::update(const double dt)
 {
-  // Update here
-  // reset manager
+  // Reset manager
   manager.refresh();
 
-  manager.update(dt);
-
-  for (int i = 0; i < manager.m_entities.size(); ++i)
+  if (input.isMouseClicked(SDL_BUTTON_LEFT))
   {
+    printf("THATS A LEFT CLICK\n");
   }
+
+  manager.update(dt);
 }
 
 void Engine::render()
