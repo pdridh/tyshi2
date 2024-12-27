@@ -1,6 +1,5 @@
 #include "Engine.h"
 
-const double Engine::FIXED_TIMESTEP = 1.0 / 60.0;
 const SDL_Color Engine::RENDER_CLEAR_COLOR = {0, 0, 0, 255}; // Black clear color
 const int Engine::SCREEN_WIDTH = 800;
 const int Engine::SCREEN_HEIGHT = 600;
@@ -15,7 +14,6 @@ Engine::Engine(const std::string &title)
   }
 
   // All time related stuff in seconds
-  double accumulatedTime = 0.0;
   double lastTime = SDL_GetTicks() / 1000.0;
 
   // main loop
@@ -24,17 +22,9 @@ Engine::Engine(const std::string &title)
     double newTime = SDL_GetTicks() / 1000.0;
     double elapsedTime = newTime - lastTime;
     lastTime = newTime;
-
-    accumulatedTime += elapsedTime;
-
     processInput();
-    while (accumulatedTime > FIXED_TIMESTEP)
-    {
-      processInput();
-      update(FIXED_TIMESTEP);
-      accumulatedTime -= FIXED_TIMESTEP;
-      m_runtime += FIXED_TIMESTEP;
-    }
+    update(elapsedTime);
+    m_runtime += elapsedTime;
     render();
   }
 }
