@@ -4,12 +4,12 @@ project(tyshi2)
 
 set(app_name app)
 
-add_executable(${app_name} 
-src/main.cpp
-src/core/Engine.cpp
-src/ECS/EntityManager.cpp
-src/ECS/components/Animator.cpp
+# Gather source files
+file(GLOB_RECURSE SOURCE_FILES 
+    ${CMAKE_SOURCE_DIR}/src/*.cpp
 )
+
+add_executable(${app_name} ${SOURCE_FILES})
 
 
 include(FindPkgConfig)
