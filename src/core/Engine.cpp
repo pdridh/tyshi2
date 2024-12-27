@@ -144,22 +144,8 @@ void Engine::update(const double dt)
   for (int i = 0; i < manager.m_entities.size(); ++i)
   {
     if (!manager.m_entities[i]->hasComponent<Collider>())
-      continue;
-
-    // Here means it has the component so check others
-    for (int j = i + 1; j < manager.m_entities.size(); ++j)
     {
-      Collider &iCollider = manager.m_entities[i]->getComponent<Collider>();
-      Collider &jCollider = manager.m_entities[j]->getComponent<Collider>();
-
-      if (iCollider.box.x <= jCollider.box.x + jCollider.box.w &&
-          iCollider.box.x + iCollider.box.w >= jCollider.box.x &&
-          iCollider.box.y <= jCollider.box.y + jCollider.box.h &&
-          iCollider.box.y + iCollider.box.h >= jCollider.box.y)
-      {
-        // iCollider.triggerCollision();
-        jCollider.triggerCollision();
-      }
+      continue;
     }
   }
 }
