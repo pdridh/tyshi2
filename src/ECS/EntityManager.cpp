@@ -9,6 +9,9 @@ Entity &EntityManager::addEntity()
 
 void EntityManager::update(const double dt)
 {
+  // Reset manager
+  refresh();
+
   for (auto &e : m_entities)
   {
     e->update(dt);

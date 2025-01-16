@@ -7,11 +7,11 @@
 
 #include "Input.h"
 
-#include "../ECS/components/Transform.h"
-#include "../ECS/components/Movement.h"
-#include "../ECS/components/Animator.h"
-#include "../ECS/components/Collider.h"
-#include "../ECS/EntityManager.h"
+// #include "../ECS/components/Transform.h"
+// #include "../ECS/components/Movement.h"
+// #include "../ECS/components/Animator.h"
+// #include "../ECS/components/Collider.h"
+// #include "../ECS/EntityManager.h"
 
 // Main engine class that handles the main loop, window creation and frame speed stuff
 // TODO: lots of changes (eg. read config from file and stuff)
@@ -43,7 +43,6 @@ private:
 
   Input input;
 
-  EntityManager manager;
   // Initialize helper function for constructor to init stuff
   bool init(const std::string &window_title);
 

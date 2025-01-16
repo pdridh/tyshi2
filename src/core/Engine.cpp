@@ -101,15 +101,6 @@ void Engine::processInput()
 
 void Engine::update(const double dt)
 {
-  // Reset manager
-  manager.refresh();
-
-  if (input.isMouseClicked(SDL_BUTTON_LEFT))
-  {
-    printf("THATS A LEFT CLICK\n");
-  }
-
-  manager.update(dt);
 }
 
 void Engine::render()
@@ -126,5 +117,4 @@ void Engine::render()
 void Engine::renderGame()
 {
   // Draw stuff here
-  manager.draw(m_renderer);
 }
