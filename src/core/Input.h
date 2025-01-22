@@ -13,6 +13,9 @@ struct MouseButtonState
   bool held = false;
   bool clicked = false;
   bool released = false;
+
+  // For position at this state
+  Vec2 position;
 };
 
 /// @brief Handles input stuff, thinking of decoupling the sdl stuff from actions (idk)
@@ -72,11 +75,14 @@ public:
   /// @return boolean based on the state
   bool isMouseReleased(MouseButton btn) const;
 
-  /// @return The current mouse position captured by the handleMouseMotion()
-  const Vec2 &getMouseWindowPosition() const;
+  /// @return The position that this btn was clicked on
+  const Vec2 getMouseClickPosition(MouseButton btn) const
+  {
+    const MouseButtonState &state = m_buttonMap.at(btn);
+    return state.position;
+  }
 
 private:
   std::unordered_map<MouseButton, MouseButtonState> m_buttonMap;
-  Vec2 m_mouseWindowPosition;
   const KeyboardButton *m_keyboardState;
 };

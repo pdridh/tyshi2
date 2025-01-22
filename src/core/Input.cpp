@@ -27,11 +27,6 @@ void Input::resetMouse()
   }
 }
 
-void Input::handleMouseMotion(const SDL_MouseMotionEvent &e)
-{
-  m_mouseWindowPosition = Vec2((double)e.x, (double)e.y);
-}
-
 void Input::handleMouseButtonDown(const SDL_MouseButtonEvent &e)
 {
   MouseButtonState &currentState = m_buttonMap[e.button];
@@ -40,6 +35,7 @@ void Input::handleMouseButtonDown(const SDL_MouseButtonEvent &e)
     currentState.clicked = true;
   }
   currentState.held = true;
+  currentState.position = Vec2(e.x, e.y);
 }
 
 void Input::handleMouseButtonUp(const SDL_MouseButtonEvent &e)
@@ -47,6 +43,7 @@ void Input::handleMouseButtonUp(const SDL_MouseButtonEvent &e)
   MouseButtonState &currentState = m_buttonMap[e.button];
   currentState.released = true;
   currentState.held = false;
+  currentState.position = Vec2(e.x, e.y);
 }
 
 bool Input::isMouseClicked(MouseButton btn) const
@@ -62,9 +59,4 @@ bool Input::isMouseHeld(MouseButton btn) const
 bool Input::isMouseReleased(MouseButton btn) const
 {
   return m_buttonMap.at(btn).released;
-}
-
-const Vec2 &Input::getMouseWindowPosition() const
-{
-  return m_mouseWindowPosition;
 }
