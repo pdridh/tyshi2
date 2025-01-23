@@ -5,6 +5,9 @@
 // Base class for all game states
 class GameState
 {
+protected:
+  GameState() {}
+
 public:
   virtual void onEnter(Engine *game) = 0;
   virtual void onExit() = 0;
@@ -20,7 +23,4 @@ public:
   {
     game->changeState(state);
   }
-
-protected:
-  GameState() {}
 };

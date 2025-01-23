@@ -28,7 +28,7 @@ void PlayState::resume()
 
 void PlayState::update(Engine *game)
 {
-  if (game->input.isKeyPressed(SDL_SCANCODE_M))
+  if (game->input.isKeyDownFrame(SDL_SCANCODE_ESCAPE))
   {
     game->changeState(MenuState::instance());
   }

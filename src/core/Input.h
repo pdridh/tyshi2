@@ -4,8 +4,7 @@
 #include "../utils/Vec2.h"
 #include <unordered_map>
 
-typedef Uint8 KeyboardButton;
-typedef Uint8 MouseButton;
+typedef u_int8_t MouseButton;
 
 /// @brief States that a mouse button can have
 struct MouseButtonState
@@ -21,24 +20,36 @@ struct MouseButtonState
 /// @brief Handles input stuff, thinking of decoupling the sdl stuff from actions (idk)
 class Input
 {
+private:
+  std::unordered_map<MouseButton, MouseButtonState> m_buttonMap;
+  std::vector<bool> m_keysDownThisFrame;
+  std::vector<bool> m_keysUpThisFrame;
+
+private:
+  // Reset keysdown and keysup this frame
+  void resetKeyboard();
+
+  // Reset the MouseButtonState for all butons
+  void resetMouse();
+
 public:
   Input();
 
+  // Reset both keuyboard and mouse
+  void reset();
+
   /***KEYBOARD STUFF****/
 
-  /// @brief Retrieves the current snapshot of the keyboard from SDL's api and updates the m_keyboardState
-  void updateKeyState();
+  void handleKeyButtonDown(SDL_KeyboardEvent &e);
+  void handleKeyButtonUp(SDL_KeyboardEvent &e);
 
-  /// @param key SDL_Scancode that SDL api uses
-  /// @return true or false based on the m_keyboardState
-  bool isKeyPressed(SDL_Scancode key) const;
+  // Checks if a key was pressed down THIS frame (resets every frame unless pressed down)
+  bool isKeyDownFrame(SDL_Scancode key) const;
+
+  // Checks if a key was let go THIS frame (resets every frame)
+  bool isKeyUpFrame(SDL_Scancode key) const;
 
   /***MOUSE STUFF****/
-
-  /**
-   * @brief   Reset the "clicked" and "released" flag for all mouse buttons after the frame the action was done in
-   */
-  void resetMouse();
 
   /**
    * @brief   Process the SDL_MouseMotionEvent and retrieves the current position of the cursor in the window
@@ -81,8 +92,4 @@ public:
     const MouseButtonState &state = m_buttonMap.at(btn);
     return state.position;
   }
-
-private:
-  std::unordered_map<MouseButton, MouseButtonState> m_buttonMap;
-  const KeyboardButton *m_keyboardState;
 };

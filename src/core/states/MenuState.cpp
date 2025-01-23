@@ -29,11 +29,11 @@ void MenuState::resume()
 
 void MenuState::update(Engine *game)
 {
-  if (game->input.isKeyPressed(SDL_SCANCODE_ESCAPE))
+  if (game->input.isKeyDownFrame(SDL_SCANCODE_ESCAPE))
   {
     game->quit();
   }
-  else if (game->input.isKeyPressed(SDL_SCANCODE_SPACE))
+  else if (game->input.isKeyDownFrame(SDL_SCANCODE_SPACE))
   {
     game->changeState(PlayState::instance());
   }

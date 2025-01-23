@@ -1,26 +1,45 @@
 #include "Input.h"
+#include <algorithm>
 
 Input::Input()
 {
-  m_keyboardState = nullptr;
+  m_keysDownThisFrame.resize(SDL_NUM_SCANCODES, false);
+  m_keysUpThisFrame.resize(SDL_NUM_SCANCODES, false);
   m_buttonMap[SDL_BUTTON_LEFT] = {};
   m_buttonMap[SDL_BUTTON_RIGHT] = {};
   m_buttonMap[SDL_BUTTON_MIDDLE] = {};
 }
 
-bool Input::isKeyPressed(SDL_Scancode key) const
+void Input::reset()
 {
-  if (m_keyboardState == nullptr)
-  {
-    return false;
-  }
-
-  return m_keyboardState[key];
+  resetKeyboard();
+  resetMouse();
 }
 
-void Input::updateKeyState()
+void Input::resetKeyboard()
 {
-  m_keyboardState = SDL_GetKeyboardState(NULL);
+  std::fill(m_keysDownThisFrame.begin(), m_keysDownThisFrame.end(), false);
+  std::fill(m_keysUpThisFrame.begin(), m_keysUpThisFrame.end(), false);
+}
+
+void Input::handleKeyButtonDown(SDL_KeyboardEvent &e)
+{
+  m_keysDownThisFrame[e.keysym.scancode] = true;
+}
+
+void Input::handleKeyButtonUp(SDL_KeyboardEvent &e)
+{
+  m_keysUpThisFrame[e.keysym.scancode] = true;
+}
+
+bool Input::isKeyDownFrame(SDL_Scancode key) const
+{
+  return m_keysDownThisFrame[key];
+}
+
+bool Input::isKeyUpFrame(SDL_Scancode key) const
+{
+  return m_keysUpThisFrame[key];
 }
 
 void Input::resetMouse()

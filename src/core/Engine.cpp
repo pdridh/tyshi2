@@ -76,7 +76,7 @@ void Engine::processInput()
   // Process events
   SDL_Event event;
 
-  input.resetMouse();
+  input.reset();
 
   while (SDL_PollEvent(&event))
   {
@@ -84,6 +84,12 @@ void Engine::processInput()
     {
     case SDL_QUIT:
       m_running = false;
+      break;
+    case SDL_KEYDOWN:
+      input.handleKeyButtonDown(event.key);
+      break;
+    case SDL_KEYUP:
+      input.handleKeyButtonUp(event.key);
       break;
     case SDL_MOUSEWHEEL:
       // event
@@ -98,7 +104,6 @@ void Engine::processInput()
       break;
     }
   }
-  input.updateKeyState();
 }
 
 void Engine::changeState(GameState *state)
@@ -153,6 +158,10 @@ void Engine::quit()
 
 void Engine::update(const float dt)
 {
+  if (input.isKeyUpFrame(SDL_SCANCODE_A))
+  {
+    printf("A\n");
+  }
 
   // Update top of the stack
   m_states.back()->update(this);
