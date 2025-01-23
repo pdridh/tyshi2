@@ -1,4 +1,6 @@
 #include "Engine.h"
+#include "states/PlayState.h"
+#include "states/MenuState.h"
 
 const SDL_Color Engine::RENDER_CLEAR_COLOR = {0, 0, 0, 255}; // Black clear color
 const int Engine::SCREEN_WIDTH = 800;
@@ -14,13 +16,13 @@ Engine::Engine(const std::string &title)
   }
 
   // All time related stuff in seconds
-  double lastTime = SDL_GetTicks() / 1000.0;
+  float lastTime = SDL_GetTicks() / 1000.0;
 
   // main loop
   while (m_running)
   {
-    double newTime = SDL_GetTicks() / 1000.0;
-    double elapsedTime = newTime - lastTime;
+    float newTime = SDL_GetTicks() / 1000.0;
+    float elapsedTime = newTime - lastTime;
     lastTime = newTime;
     processInput();
     update(elapsedTime);
@@ -43,6 +45,7 @@ bool Engine::init(const std::string &title)
     return false;
   }
 
+  m_windowFlags = SDL_WINDOW_RESIZABLE;
   // TODO change how the window size works
   m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, m_windowFlags);
 
@@ -59,6 +62,10 @@ bool Engine::init(const std::string &title)
     printf("Engine::init - Failed to create renderer: %s\n", SDL_GetError());
     return false;
   }
+
+  camera = new Camera(m_renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+  changeState(MenuState::instance());
 
   return true;
 }
@@ -78,11 +85,6 @@ void Engine::processInput()
     case SDL_QUIT:
       m_running = false;
       break;
-    case SDL_KEYDOWN:
-      if (event.key.keysym.sym == SDLK_ESCAPE)
-      {
-        m_running = false;
-      }
     case SDL_MOUSEWHEEL:
       // event
       break;
@@ -99,8 +101,66 @@ void Engine::processInput()
   input.updateKeyState();
 }
 
-void Engine::update(const double dt)
+void Engine::changeState(GameState *state)
 {
+  // Exit from current state and
+  // Remove it from the states stack
+  if (!m_states.empty())
+  {
+    m_states.back()->onExit();
+    m_states.pop_back();
+  }
+
+  // Change to another state completely
+  m_states.push_back(state);
+  m_states.back()->onEnter(this);
+}
+
+void Engine::addState(GameState *state)
+{
+  // pause current state
+  if (!m_states.empty())
+  {
+    m_states.back()->pause();
+  }
+
+  // Add a new state above this state
+  m_states.push_back(state);
+  m_states.back()->onEnter(this);
+}
+
+void Engine::exitState()
+{
+  // Pop current state
+  if (!m_states.empty())
+  {
+    m_states.back()->onExit();
+    m_states.pop_back();
+  }
+
+  // resume previous state
+  if (!m_states.empty())
+  {
+    m_states.back()->resume();
+  }
+}
+
+void Engine::quit()
+{
+  clean();
+  m_running = false;
+}
+
+void Engine::update(const float dt)
+{
+
+  // Update top of the stack
+  m_states.back()->update(this);
+}
+
+void Engine::renderGame()
+{
+  m_states.back()->draw(this);
 }
 
 void Engine::render()
@@ -114,7 +174,10 @@ void Engine::render()
   SDL_RenderPresent(m_renderer);
 }
 
-void Engine::renderGame()
+void Engine::clean()
 {
-  // Draw stuff here
+  // TODO
+  // Delete memory stuff
+  // Handle everything
+  // quit sdl and img shit
 }

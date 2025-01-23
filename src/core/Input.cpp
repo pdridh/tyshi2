@@ -2,7 +2,7 @@
 
 Input::Input()
 {
-  m_keyboardState = {};
+  m_keyboardState = nullptr;
   m_buttonMap[SDL_BUTTON_LEFT] = {};
   m_buttonMap[SDL_BUTTON_RIGHT] = {};
   m_buttonMap[SDL_BUTTON_MIDDLE] = {};
@@ -10,6 +10,11 @@ Input::Input()
 
 bool Input::isKeyPressed(SDL_Scancode key) const
 {
+  if (m_keyboardState == nullptr)
+  {
+    return false;
+  }
+
   return m_keyboardState[key];
 }
 

@@ -6,7 +6,9 @@
 #include <string>
 
 #include "Input.h"
+#include "Camera.h"
 
+class GameState;
 // #include "../ECS/components/Transform.h"
 // #include "../ECS/components/Movement.h"
 // #include "../ECS/components/Animator.h"
@@ -23,12 +25,12 @@ public:
 private:
   // Static
   // TODO read these from configs
-  static const double FIXED_TIMESTEP;
+  static const float FIXED_TIMESTEP;
   static const SDL_Color RENDER_CLEAR_COLOR;
   static const int SCREEN_WIDTH;
   static const int SCREEN_HEIGHT;
 
-  double m_runtime; // Total time the engine ran
+  float m_runtime; // Total time the engine ran
 
   bool m_running;
   // Dt related stuff
@@ -41,8 +43,20 @@ private:
   int m_rendererFlags;
   SDL_Renderer *m_renderer;
 
-  Input input;
+  std::vector<GameState *> m_states;
 
+public:
+  Input input;
+  Camera *camera;
+
+  // State related stuff
+  void changeState(GameState *state);
+  void addState(GameState *state);
+  void exitState();
+
+  void quit();
+
+private:
   // Initialize helper function for constructor to init stuff
   bool init(const std::string &window_title);
 
@@ -50,11 +64,12 @@ private:
   void processInput();
 
   // Update game
-  void update(double dt);
-
+  void update(float dt);
   // Render frame that clears and swaps buffer each frame
   void render();
+
   // Main render function for rendering the game
   void renderGame();
-  // render systems
+
+  void clean();
 };
