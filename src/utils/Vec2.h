@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <cmath>
 #include <vector>
 
@@ -9,10 +10,18 @@ public:
   float x;
   float y;
 
+  static constexpr float DIFFERENCE_TOLERATION = 1e-6;
+
   Vec2(float x_arg = 0.0, float y_arg = 0.0) : x(x_arg), y(y_arg) {}
 
   // Get zero vector
   inline static Vec2 ZERO() { return Vec2(0, 0); }
+
+  // For debugging
+  inline void print(const char *tag)
+  {
+    printf("{Vec2} %s: %f, %f\n", tag, x, y);
+  }
 
   // Normalizes the vector
   inline Vec2 &normalize()
@@ -66,5 +75,13 @@ public:
   {
     x -= right.x;
     y -= right.y;
+  }
+
+  inline bool operator==(Vec2 const &right)
+  {
+    float deltaX = std::fabs(x - right.x);
+    float deltaY = std::fabs(y - right.y);
+
+    return deltaX < DIFFERENCE_TOLERATION && deltaY < DIFFERENCE_TOLERATION;
   }
 };
