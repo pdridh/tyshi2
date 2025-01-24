@@ -28,9 +28,9 @@ void Camera::drawRect(Vec2 worldPos, float width, float height, Color color)
   SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
 
   // Everything is centered
-  Vec2 finalPos = worldToScreen(Vec2(worldPos.x - width / 2, worldPos.y - height / 2));
-  SDL_FRect rect = {finalPos.x,
-                    finalPos.y,
+  Vec2 screenPos = worldToScreen(Vec2(worldPos.x - width / 2, worldPos.y - height / 2));
+  SDL_FRect rect = {screenPos.x,
+                    screenPos.y,
                     width,
                     height};
 
@@ -44,7 +44,7 @@ void Camera::drawRect(float worldX, float worldY, float width, float height, Col
 
 void Camera::drawTexture(SDL_Texture *texture, SDL_Rect &srcRect, Vec2 worldPos, float width, float height)
 {
-  Vec2 screenPos = worldToScreen(worldPos);
+  Vec2 screenPos = worldToScreen(Vec2(worldPos.x - width / 2, worldPos.y - height / 2));
   SDL_FRect dstRect = {screenPos.x, screenPos.y, width, height};
 
   SDL_RenderCopyExF(m_renderer, texture, &srcRect, &dstRect, 0, NULL, SDL_FLIP_NONE);

@@ -39,13 +39,14 @@ private:
   int m_windowFlags; // Maybe upgrade to opengl later and stuff
   SDL_Window *m_window;
 
-  // Renderer stuff
-  int m_rendererFlags;
-  SDL_Renderer *m_renderer;
-
   std::vector<GameState *> m_states;
 
 public:
+  // Renderer stuff
+  int m_rendererFlags;
+
+  SDL_Renderer *m_renderer;
+
   Input input;
   Camera *camera;
 

@@ -158,10 +158,6 @@ void Engine::quit()
 
 void Engine::update(const float dt)
 {
-  if (input.isKeyUpFrame(SDL_SCANCODE_A))
-  {
-    printf("A\n");
-  }
 
   // Update top of the stack
   m_states.back()->update(this);

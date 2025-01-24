@@ -1,5 +1,6 @@
 #include "PlayState.h"
 #include "MenuState.h"
+#include "EditorState.h"
 
 PlayState PlayState::m_self;
 
@@ -31,6 +32,10 @@ void PlayState::update(Engine *game)
   if (game->input.isKeyDownFrame(SDL_SCANCODE_ESCAPE))
   {
     game->changeState(MenuState::instance());
+  }
+  else if (game->input.isKeyDownFrame(SDL_SCANCODE_GRAVE))
+  {
+    game->changeState(EditorState::instance());
   }
 }
 
