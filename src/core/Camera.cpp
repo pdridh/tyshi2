@@ -3,6 +3,7 @@
 Camera::Camera(SDL_Renderer *renderer, float width, float height)
     : m_renderer{renderer}, m_width{width}, m_height{height}
 {
+  centerOn(Vec2::ZERO());
 }
 
 void Camera::centerOn(Vec2 centerPos)
@@ -12,7 +13,9 @@ void Camera::centerOn(Vec2 centerPos)
 
 Vec2 Camera::screenToWorld(Vec2 screenPos)
 {
-  return screenPos + m_center;
+  Vec2 world = screenPos + m_center;
+  world.y *= -1;
+  return world;
 }
 
 Vec2 Camera::worldToScreen(Vec2 worldPos)
