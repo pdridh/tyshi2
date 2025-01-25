@@ -15,17 +15,17 @@ struct Color
 class Camera
 {
 private:
-  Vec2 m_center;
+  Vec2f m_center;
   SDL_Renderer *m_renderer;
   float m_width;
   float m_height;
 
 public:
   Camera(SDL_Renderer *renderer, float width, float height);
-  void centerOn(Vec2 centerPos);
-  Vec2 screenToWorld(Vec2 screenPos);
-  Vec2 worldToScreen(Vec2 worldPos);
-  void drawRect(Vec2 worldPos, float width, float height, Color color);
+  void centerOn(Vec2f centerPos);
+  Vec2f screenToWorld(Vec2f screenPos);
+  Vec2f worldToScreen(Vec2f worldPos);
+  void drawRect(Vec2f worldPos, float width, float height, Color color);
   void drawRect(float worldX, float worldY, float width, float height, Color color);
-  void drawTexture(SDL_Texture *texture, SDL_Rect &srcRect, Vec2 worldPos, float width, float height);
+  void drawTexture(SDL_Texture *texture, SDL_Rect &srcRect, Vec2f worldPos, float width, float height);
 };

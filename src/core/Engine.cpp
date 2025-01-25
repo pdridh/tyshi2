@@ -93,6 +93,7 @@ void Engine::processInput()
       break;
     case SDL_MOUSEWHEEL:
       // event
+      input.handleMouseWheel(event.wheel);
       break;
     case SDL_MOUSEBUTTONUP:
       input.handleMouseButtonUp(event.button);

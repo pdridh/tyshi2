@@ -1,8 +1,11 @@
 #pragma once
 
 #include <SDL2/SDL.h>
+
 #include "../utils/Vec2.h"
+
 #include <unordered_map>
+#include <vector>
 
 typedef u_int8_t MouseButton;
 
@@ -14,7 +17,7 @@ struct MouseButtonState
   bool released = false;
 
   // For position at this state
-  Vec2 position;
+  Vec2f position;
 };
 
 /// @brief Handles input stuff, thinking of decoupling the sdl stuff from actions (idk)
@@ -24,6 +27,7 @@ private:
   std::unordered_map<MouseButton, MouseButtonState> m_buttonMap;
   std::vector<bool> m_keysDownThisFrame;
   std::vector<bool> m_keysUpThisFrame;
+  int mouseWheelY;
 
 private:
   // Reset keysdown and keysup this frame
@@ -56,6 +60,7 @@ public:
    * @param   e The reference to the event that SDL loads the information into
    */
   void handleMouseMotion(const SDL_MouseMotionEvent &e);
+  void handleMouseWheel(const SDL_MouseWheelEvent &e);
 
   /**
    * @brief   Process the SDL_MouseButtonEvent and update the mousestate based on the mouse button clicked
@@ -86,8 +91,10 @@ public:
   /// @return boolean based on the state
   bool isMouseReleased(MouseButton btn) const;
 
+  int mouseScroll() const { return mouseWheelY; }
+
   /// @return The position that this btn was clicked on
-  const Vec2 getMouseClickPosition(MouseButton btn) const
+  const Vec2f getMouseClickPosition(MouseButton btn) const
   {
     const MouseButtonState &state = m_buttonMap.at(btn);
     return state.position;

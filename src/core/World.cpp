@@ -10,8 +10,8 @@ World::World(Engine *game)
   m_worldSize = m_nChunks * m_chunkSize;
   m_tileSize = m_chunkSize / m_nTiles;
 
-  m_origin = Vec2::ZERO();
-  m_topLeft = m_origin - Vec2(m_worldSize / 2, (m_worldSize / 2) * -1);
+  m_origin = Vec2f::ZERO();
+  m_topLeft = m_origin - Vec2f(m_worldSize / 2, (m_worldSize / 2) * -1);
 
   // Storing 2d in 1d
   chunks.resize(m_nChunks * m_nChunks);
@@ -44,46 +44,45 @@ World::World(Engine *game)
   }
 }
 
-Vec2 World::worldToNthChunk(Vec2 worldPos)
+Vec2i World::worldToNthChunk(Vec2f worldPos)
 {
   // Change origin to world top left
-  Vec2 worldTopLeftPos = worldPos - m_topLeft;
-  worldTopLeftPos = Vec2(fabs(worldTopLeftPos.x), fabs(worldTopLeftPos.y));
+  Vec2f worldTopLeftPos = worldPos - m_topLeft;
 
-  Vec2 nthChunk = worldTopLeftPos.getScaled(1.f / m_chunkSize);
+  worldTopLeftPos = Vec2f(std::fabs(worldTopLeftPos.x), std::fabs(worldTopLeftPos.y));
+
+  Vec2i nthChunk = worldTopLeftPos.scaleDown(m_chunkSize);
 
   return nthChunk;
 }
 
-Vec2 World::worldToChunk(Vec2 worldPos)
+Vec2f World::worldToChunk(Vec2f worldPos)
 {
 
-  Vec2 nthChunk = worldToNthChunk(worldPos);
+  Vec2i nthChunk = worldToNthChunk(worldPos);
 
-  Vec2 worldTopLeftPos = worldPos - m_topLeft;
-  worldTopLeftPos = Vec2(fabs(worldTopLeftPos.x), fabs(worldTopLeftPos.y));
+  Vec2f worldTopLeftPos = worldPos - m_topLeft;
+  worldTopLeftPos = Vec2f(fabs(worldTopLeftPos.x), fabs(worldTopLeftPos.y));
 
-  // TODO change the casts to Vec2Integers
-  Vec2 chunkOrigin = Vec2((int)nthChunk.x * m_chunkSize, (int)nthChunk.y * m_chunkSize);
-  Vec2 chunkPos = worldTopLeftPos - chunkOrigin;
+  Vec2f chunkOrigin = nthChunk.scale(m_chunkSize);
+  Vec2f chunkPos = worldTopLeftPos - chunkOrigin;
 
   return chunkPos;
 }
 
-Vec2 World::worldToNthTile(Vec2 worldPos)
+Vec2i World::worldToNthTile(Vec2f worldPos)
 {
-  Vec2 chunkPos = worldToChunk(worldPos);
-  Vec2 nthTile = chunkPos.getScaled(1.f / m_tileSize);
+  Vec2f chunkPos = worldToChunk(worldPos);
+  Vec2i nthTile = chunkPos.scaleDown(m_tileSize);
 
   return nthTile;
 }
 
-Vec2 World::tileToWorld(Vec2 nthChunk, Vec2 nthTile)
+Vec2f World::tileToWorld(Vec2i nthChunk, Vec2i nthTile)
 {
-  // nthTile.scale(m_tileSize);
-  Vec2 chunkTopLeft = nthChunk.scale(m_chunkSize);
-  Vec2 tileCenter = nthTile.scale(m_tileSize) + Vec2(m_tileSize / 2, m_tileSize / 2);
-  Vec2 worldPos = Vec2(m_topLeft.x, -1 * m_topLeft.y) + chunkTopLeft + tileCenter;
+  Vec2i chunkTopLeft = nthChunk.scale(m_chunkSize);
+  Vec2i tileCenter = nthTile.scale(m_tileSize) + Vec2i(m_tileSize / 2, m_tileSize / 2);
+  Vec2f worldPos = Vec2i(m_topLeft.x, -1 * m_topLeft.y) + chunkTopLeft + tileCenter;
 
   return worldPos;
 }
@@ -94,7 +93,7 @@ void World::drawTileGrid(int xthChunk, int ythChunk)
   {
     for (int xthTile = 0; xthTile < m_nTiles; ++xthTile)
     {
-      Vec2 tilePos = tileToWorld(Vec2(xthChunk, ythChunk), Vec2(xthTile, ythTile));
+      Vec2f tilePos = tileToWorld(Vec2i(xthChunk, ythChunk), Vec2i(xthTile, ythTile));
       m_game->camera->drawRect(tilePos, m_tileSize, m_tileSize, {80, 80, 80, 255});
     }
   }
@@ -111,9 +110,9 @@ void World::drawGrid()
       // Draw tiles inside chunk
       drawTileGrid(xthChunk, ythChunk);
       // Draw the chunk
-      m_game->camera->drawRect(Vec2(m_topLeft.x + m_chunkSize / 2 + (xthChunk * m_chunkSize),
-                                    -1 * m_topLeft.y + m_chunkSize / 2 + (ythChunk * m_chunkSize)),
-                               (float)m_chunkSize, (float)m_chunkSize, {0, 255, 0, 255});
+      m_game->camera->drawRect(Vec2f(m_topLeft.x + m_chunkSize / 2 + (xthChunk * m_chunkSize),
+                                     -1 * m_topLeft.y + m_chunkSize / 2 + (ythChunk * m_chunkSize)),
+                               m_chunkSize, m_chunkSize, {0, 255, 0, 255});
     }
   }
 
@@ -130,8 +129,8 @@ void World::drawChunk(int xthChunk, int ythChunk, Chunk *chunk)
     {
       if (chunk->tiles[ythTile * m_nTiles + xthTile])
       {
-        Vec2 tilePos =
-            tileToWorld(Vec2(xthChunk, ythChunk), Vec2(xthTile, ythTile));
+        Vec2f tilePos =
+            tileToWorld(Vec2i(xthChunk, ythChunk), Vec2i(xthTile, ythTile));
         int tileCode = chunk->tiles[ythTile * m_nTiles + xthTile]->atlasCode;
         m_game->camera->drawTexture(tileSheet, atlas[tileCode], tilePos, m_tileSize, m_tileSize);
       }
@@ -139,19 +138,16 @@ void World::drawChunk(int xthChunk, int ythChunk, Chunk *chunk)
   }
 }
 
-void World::changeChunkTile(Vec2 worldPos, int atlasCode)
+void World::changeChunkTile(Vec2f worldPos, int atlasCode)
 {
-  Vec2 nthChunk = worldToNthChunk(worldPos);
-  Vec2 chunkPos = worldToChunk(worldPos);
-  Vec2 nthTile = worldToNthTile(worldPos);
+  Vec2i nthChunk = worldToNthChunk(worldPos);
+  Vec2i nthTile = worldToNthTile(worldPos);
 
-  // TODO change to Vec2I instead of casting
-  changeChunkTile((int)nthChunk.x, (int)nthChunk.y, (int)nthTile.x, (int)nthTile.y, atlasCode);
+  changeChunkTile(nthChunk.x, nthChunk.y, nthTile.x, nthTile.y, atlasCode);
 }
 
 void World::changeChunkTile(int xthChunk, int ythChunk, int xthTile, int ythTile, int atlasCode)
 {
-  printf("Changing tile at: CHUNK: %d, %d; TILE: %d,%d to %d\n", xthChunk, ythChunk, xthTile, ythTile, atlasCode);
   auto &chunk = chunks[ythChunk * m_nChunks + xthChunk];
   if (chunk == nullptr)
   {

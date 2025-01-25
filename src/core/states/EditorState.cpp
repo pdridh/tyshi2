@@ -13,7 +13,7 @@ void EditorState::onEnter(Engine *game)
 {
   printf("Entering editor...\n");
 
-  game->camera->centerOn(Vec2(800 / 2, 600 / 2));
+  game->camera->centerOn(Vec2f(800 / 2, 600 / 2));
 
   // SDL_Texture *text = IMG_LoadTexture(game->m_renderer, "assets/tileset.png");
   world = new World(game);
@@ -47,29 +47,32 @@ void EditorState::update(Engine *game)
   // Camera updater
   if (game->input.isKeyDownFrame(SDL_SCANCODE_A))
   {
-    currentPos += Vec2(-speed, 0);
+    currentPos += Vec2f(-speed, 0);
   }
   if (game->input.isKeyDownFrame(SDL_SCANCODE_D))
   {
-    currentPos += Vec2(speed, 0);
+    currentPos += Vec2f(speed, 0);
   }
   if (game->input.isKeyDownFrame(SDL_SCANCODE_W))
   {
-    currentPos += Vec2(0, -speed);
+    currentPos += Vec2f(0, -speed);
   }
   if (game->input.isKeyDownFrame(SDL_SCANCODE_S))
   {
-    currentPos += Vec2(0, speed);
+    currentPos += Vec2f(0, speed);
+  }
+
+  if (game->input.mouseScroll() != 0)
+  {
+    currentCode += game->input.mouseScroll();
   }
 
   if (game->input.isMouseClicked(SDL_BUTTON_LEFT))
   {
     // Lets say current tile held has atlas code 2
-    int currentCode = 2;
 
-    Vec2 mousePos = game->input.getMouseClickPosition(SDL_BUTTON_LEFT);
-    Vec2 mouseWorldPos = game->camera->screenToWorld(mousePos);
-
+    Vec2f mousePos = game->input.getMouseClickPosition(SDL_BUTTON_LEFT);
+    Vec2f mouseWorldPos = game->camera->screenToWorld(mousePos);
     world->changeChunkTile(mouseWorldPos, currentCode);
   }
 

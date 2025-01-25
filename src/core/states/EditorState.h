@@ -9,8 +9,9 @@ private:
   static EditorState m_self;
   EditorState() {}
 
-  Vec2 currentPos = Vec2(0, 0);
+  Vec2f currentPos = Vec2f();
   World *world;
+  int currentCode = 1;
 
 public:
   static EditorState *instance();
