@@ -1,10 +1,9 @@
 #include <SDL2/SDL.h>
 
-#include "core/Engine.h"
+#include "core/Engine.hpp"
 
 #include <random>
-
-#include "time.h"
+#include <time.h>
 
 int main()
 {

@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "Camera.hpp"
 
 Camera::Camera(SDL_Renderer *renderer, float width, float height)
     : m_renderer{renderer}, m_width{width}, m_height{height}

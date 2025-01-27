@@ -5,8 +5,8 @@
 
 #include <string>
 
-#include "Input.h"
-#include "Camera.h"
+#include "Input.hpp"
+#include "Camera.hpp"
 
 class GameState;
 // #include "../ECS/components/Transform.h"

@@ -1,6 +1,6 @@
-#include "Engine.h"
-#include "states/PlayState.h"
-#include "states/MenuState.h"
+#include "Engine.hpp"
+#include "states/PlayState.hpp"
+#include "states/MenuState.hpp"
 
 const SDL_Color Engine::RENDER_CLEAR_COLOR = {0, 0, 0, 255}; // Black clear color
 const int Engine::SCREEN_WIDTH = 800;

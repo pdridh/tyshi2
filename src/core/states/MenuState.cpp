@@ -1,6 +1,6 @@
-#include "MenuState.h"
-#include "PlayState.h"
-#include "EditorState.h"
+#include "MenuState.hpp"
+#include "PlayState.hpp"
+#include "EditorState.hpp"
 
 MenuState MenuState::m_self;
 

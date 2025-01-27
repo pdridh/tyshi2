@@ -1,7 +1,7 @@
 #pragma once
 
-#include "GameState.h"
-#include "../World.h"
+#include "GameState.hpp"
+#include "../World.hpp"
 
 class EditorState : public GameState
 {

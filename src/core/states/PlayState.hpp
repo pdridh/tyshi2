@@ -1,15 +1,15 @@
 #pragma once
 
-#include "GameState.h"
+#include "GameState.hpp"
 
-class MenuState : public GameState
+class PlayState : public GameState
 {
 private:
-  static MenuState m_self;
-  MenuState() {}
+  static PlayState m_self;
+  PlayState() {}
 
 public:
-  static MenuState *instance();
+  static PlayState *instance();
 
   void onEnter(Engine *game) override;
   void onExit() override;
