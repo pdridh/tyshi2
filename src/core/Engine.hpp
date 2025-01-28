@@ -42,6 +42,8 @@ private:
   std::vector<GameState *> m_states;
 
 public:
+  float dt;
+
   // Renderer stuff
   int m_rendererFlags;
 
@@ -65,7 +67,7 @@ private:
   void processInput();
 
   // Update game
-  void update(float dt);
+  void update();
   // Render frame that clears and swaps buffer each frame
   void render();
 

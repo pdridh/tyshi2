@@ -25,7 +25,8 @@ Engine::Engine(const std::string &title)
     float elapsedTime = newTime - lastTime;
     lastTime = newTime;
     processInput();
-    update(elapsedTime);
+    dt = elapsedTime;
+    update();
     m_runtime += elapsedTime;
     render();
   }
@@ -157,9 +158,8 @@ void Engine::quit()
   m_running = false;
 }
 
-void Engine::update(const float dt)
+void Engine::update()
 {
-
   // Update top of the stack
   m_states.back()->update(this);
 }
