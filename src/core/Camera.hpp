@@ -25,7 +25,7 @@ public:
   void centerOn(Vec2f centerPos);
   Vec2f screenToWorld(Vec2f screenPos);
   Vec2f worldToScreen(Vec2f worldPos);
-  void drawRect(Vec2f worldPos, float width, float height, Color color);
-  void drawRect(float worldX, float worldY, float width, float height, Color color);
-  void drawTexture(SDL_Texture *texture, SDL_Rect &srcRect, Vec2f worldPos, float width, float height);
+  void drawRect(Vec2f worldPos, float width, float height, Color color, bool filled = false);
+  void drawRect(float worldX, float worldY, float width, float height, Color color, bool filled = false);
+  void drawTexture(SDL_Texture *texture, SDL_Rect &srcRect, Vec2f worldPos, float width, float height, bool trans);
 };

@@ -1,6 +1,5 @@
 #include "MenuState.hpp"
 #include "PlayState.hpp"
-#include "EditorState.hpp"
 
 MenuState MenuState::m_self;
 
@@ -37,10 +36,6 @@ void MenuState::update(Engine *game)
   else if (game->input.isKeyDownFrame(SDL_SCANCODE_SPACE))
   {
     game->changeState(PlayState::instance());
-  }
-  else if (game->input.isKeyDownFrame(SDL_SCANCODE_GRAVE))
-  {
-    game->changeState(EditorState::instance());
   }
 }
 

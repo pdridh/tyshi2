@@ -106,6 +106,7 @@ void Engine::processInput()
       break;
     }
   }
+  input.updateKeyboardState();
 }
 
 void Engine::changeState(GameState *state)
