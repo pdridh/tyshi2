@@ -27,6 +27,7 @@ private:
   std::unordered_map<MouseButton, MouseButtonState> m_buttonMap;
   std::vector<bool> m_keysDownThisFrame;
   std::vector<bool> m_keysUpThisFrame;
+  const Uint8 *m_keyboardState;
   int mouseWheelY;
 
 private:
@@ -52,6 +53,10 @@ public:
 
   // Checks if a key was let go THIS frame (resets every frame)
   bool isKeyUpFrame(SDL_Scancode key) const;
+
+  void updateKeyboardState();
+
+  bool isKeyPressed(SDL_Scancode key) const;
 
   /***MOUSE STUFF****/
 

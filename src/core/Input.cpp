@@ -42,6 +42,21 @@ bool Input::isKeyUpFrame(SDL_Scancode key) const
   return m_keysUpThisFrame[key];
 }
 
+void Input::updateKeyboardState()
+{
+  m_keyboardState = SDL_GetKeyboardState(NULL);
+}
+
+bool Input::isKeyPressed(SDL_Scancode key) const
+{
+  if (m_keyboardState)
+  {
+    return m_keyboardState[key];
+  }
+
+  return false;
+}
+
 void Input::resetMouse()
 {
   for (auto &btn : m_buttonMap)
