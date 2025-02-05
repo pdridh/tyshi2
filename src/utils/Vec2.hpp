@@ -25,10 +25,21 @@ public:
   {
   }
 
+  template <typename U>
+  Vec2<T>(const Vec2<U> *other) : x{static_cast<T>(other->x)}, y{static_cast<T>(other->y)}
+  {
+  }
+
   // Get zero vector
   inline static Vec2<T> ZERO()
   {
     return Vec2<T>(0, 0);
+  }
+
+  // Get coords as std::pair
+  inline std::pair<T, T> pair()
+  {
+    return {x, y};
   }
 
   // For debugging
@@ -36,11 +47,11 @@ public:
   {
     if (std::is_floating_point_v<T>)
     {
-      printf("{Vec2f} %s: %f, %f\n", x, y);
+      printf("{Vec2f} %s: %f, %f\n", tag, x, y);
     }
     else
     {
-      printf("{Vec2i} %s: %d, %d\n", x, y);
+      printf("{Vec2i} %s: %d, %d\n", tag, x, y);
     }
   }
 
@@ -112,7 +123,7 @@ public:
   }
 
   // Get scaled down form without modifying the vector
-  inline Vec2<T> getScaledDwon(T factor) const
+  inline Vec2<T> getScaledDown(T factor) const
   {
     return Vec2<T>(this).scaleDown(factor);
   }
