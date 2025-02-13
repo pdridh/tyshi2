@@ -1,7 +1,7 @@
 #include "World.hpp"
 
 World::World(Engine *game)
-    : m_game{game}
+    : m_game{game}, gen{555555}
 {
   m_chunkSize = 512;
   m_nChunks = 8;
@@ -10,38 +10,17 @@ World::World(Engine *game)
   m_worldSize = m_nChunks * m_chunkSize;
   m_tileSize = m_chunkSize / m_nTiles;
 
+  biomeX = std::uniform_int_distribution<>(0, m_nChunks - 1);
+  biomeY = std::uniform_int_distribution<>(0, m_nChunks - 1);
+  biomeTypeDist = std::uniform_int_distribution<>(0, Biome::MAX_BIOME_TYPE - 1);
+
   m_origin = Vec2f::ZERO();
   m_topLeft = m_origin - Vec2f(m_worldSize / 2, (m_worldSize / 2) * -1);
 
   // Storing 2d in 1d
   chunks.resize(m_nChunks * m_nChunks);
 
-  tileSheet = IMG_LoadTexture(m_game->m_renderer, "assets/tileset.png");
-  int tileWidth = 16;
-  int tileHeight = 16;
-  int texWidth;
-  int texHeight;
-
-  SDL_QueryTexture(tileSheet, NULL, NULL, &texWidth, &texHeight);
-
-  // Extract
-  int xTiles = texWidth / tileWidth;
-  int yTiles = texHeight / tileHeight;
-
-  for (int y = 0; y < yTiles; ++y)
-  {
-    for (int x = 0; x < xTiles; ++x)
-    {
-      SDL_Rect tile = {x * tileWidth, y * tileHeight, tileWidth, tileHeight};
-      atlas.push_back(tile);
-    }
-  }
-
-  for (int i = 0; i < atlas.size(); ++i)
-  {
-    printf("**********ATLAS CODE******: %d\n", i);
-    printf("Tile info: %d, %d\n", atlas[i].x, atlas[i].y);
-  }
+  generateWorld();
 }
 
 Vec2i World::worldToNthChunk(Vec2f worldPos)
@@ -129,43 +108,43 @@ void World::drawChunk(int xthChunk, int ythChunk, Chunk *chunk)
     {
       if (chunk->tiles[ythTile * m_nTiles + xthTile])
       {
-        Vec2f tilePos =
-            tileToWorld(Vec2i(xthChunk, ythChunk), Vec2i(xthTile, ythTile));
-        int tileCode = chunk->tiles[ythTile * m_nTiles + xthTile]->atlasCode;
-        m_game->camera->drawTexture(tileSheet, atlas[tileCode], tilePos, m_tileSize, m_tileSize);
+        // Vec2f tilePos =
+        //     tileToWorld(Vec2i(xthChunk, ythChunk), Vec2i(xthTile, ythTile));
+        // int tileCode = chunk->tiles[ythTile * m_nTiles + xthTile]->atlasCode;
+        // m_game->camera->drawTexture(tileSheet, atlas[tileCode], tilePos, m_tileSize, m_tileSize);
       }
     }
   }
 }
 
-void World::changeChunkTile(Vec2f worldPos, int atlasCode)
+void World::setChunkTile(Vec2f worldPos, int atlasCode)
 {
   Vec2i nthChunk = worldToNthChunk(worldPos);
   Vec2i nthTile = worldToNthTile(worldPos);
 
-  changeChunkTile(nthChunk.x, nthChunk.y, nthTile.x, nthTile.y, atlasCode);
+  setChunkTile(nthChunk.x, nthChunk.y, nthTile.x, nthTile.y, atlasCode);
 }
 
-void World::changeChunkTile(int xthChunk, int ythChunk, int xthTile, int ythTile, int atlasCode)
+void World::setChunkTile(int xthChunk, int ythChunk, int xthTile, int ythTile, int atlasCode)
 {
-  auto &chunk = chunks[ythChunk * m_nChunks + xthChunk];
-  if (chunk == nullptr)
-  {
-    chunk = std::make_unique<Chunk>(m_nTiles);
-    chunk->tiles[ythTile * m_nTiles + xthTile] = std::make_unique<Tile>(atlasCode);
-    return;
-  }
+  // auto &chunk = chunks[ythChunk * m_nChunks + xthChunk];
+  // if (chunk == nullptr)
+  // {
+  //   chunk = std::make_unique<Chunk>(m_nTiles);
+  //   chunk->tiles[ythTile * m_nTiles + xthTile] = std::make_unique<Tile>(atlasCode);
+  //   return;
+  // }
 
-  auto &tile = chunk->tiles[ythTile * m_nTiles + xthTile];
+  // auto &tile = chunk->tiles[ythTile * m_nTiles + xthTile];
 
-  // Check if tile is created
-  if (tile == nullptr)
-  {
-    tile = std::make_unique<Tile>(atlasCode);
-    return;
-  }
+  // // Check if tile is created
+  // if (tile == nullptr)
+  // {
+  //   tile = std::make_unique<Tile>(atlasCode);
+  //   return;
+  // }
 
-  tile->atlasCode = atlasCode;
+  // tile->atlasCode = atlasCode;
 }
 
 void World::update()
@@ -185,7 +164,7 @@ void World::draw()
     {
       if (chunks[y * m_nChunks + x])
       {
-        drawChunk(x, y, chunks[y * m_nChunks + x].get());
+        drawChunk(x, y, chunks[y * m_nChunks + x]);
       }
     }
   }

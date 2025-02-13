@@ -1,6 +1,5 @@
 #include "PlayState.hpp"
 #include "MenuState.hpp"
-#include "EditorState.hpp"
 
 PlayState PlayState::m_self;
 
@@ -11,11 +10,13 @@ PlayState *PlayState::instance()
 
 void PlayState::onEnter(Engine *game)
 {
+  world = new World(game);
   printf("Entering play...\n");
 }
 
 void PlayState::onExit()
 {
+  delete world;
   printf("Exiting play...\n");
 }
 
@@ -32,10 +33,6 @@ void PlayState::update(Engine *game)
   if (game->input.isKeyDownFrame(SDL_SCANCODE_ESCAPE))
   {
     game->changeState(MenuState::instance());
-  }
-  else if (game->input.isKeyDownFrame(SDL_SCANCODE_GRAVE))
-  {
-    game->changeState(EditorState::instance());
   }
 }
 
