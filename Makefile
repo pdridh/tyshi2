@@ -10,7 +10,6 @@ release:
 win-dev:
 	cmake -S . -B build/win_build -D CMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=CMake/mingw-toolchain.cmake
 	cmake --build build/win_build
-	build/win_build/app.exe
 
 win-release:
 	cmake -S . -B build/win_build -D CMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=CMake/mingw-toolchain.cmake
