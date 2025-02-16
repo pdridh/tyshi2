@@ -1,9 +1,8 @@
 #pragma once
 
-#include "SDL2/SDL.h"
-#include "SDL2/SDL_image.h"
+#include <SDL3/SDL.h>
 
-#include "Engine.hpp"
+#include "Engine.h"
 
 #include <vector>
 #include <random>
@@ -11,8 +10,8 @@
 
 struct Tile
 {
-  int atlasCode;
-  Tile(int code = -1) : atlasCode{code} {}
+  i32 atlasCode;
+  Tile(i32 code = -1) : atlasCode{code} {}
 };
 
 enum TileType
@@ -34,7 +33,7 @@ struct Chunk
 
   std::vector<Tile *> tiles;
   Biome closestBiome;
-  Chunk(int nTiles, Biome b)
+  Chunk(f32 nTiles, Biome b)
       : closestBiome{b}
   {
     // Storing 2d in 1d
@@ -58,11 +57,11 @@ struct BiomePoint
 class World
 {
 private:
-  int m_chunkSize;
-  int m_nChunks;
-  int m_worldSize;
-  int m_nTiles;
-  int m_tileSize;
+  i32 m_chunkSize;
+  i32 m_nChunks;
+  i32 m_worldSize;
+  i32 m_nTiles;
+  i32 m_tileSize;
 
   Engine *m_game;
 
@@ -80,8 +79,8 @@ private:
 private:
   BiomePoint randomSample()
   {
-    int bx = biomeX(gen);
-    int by = biomeY(gen);
+    i32 bx = biomeX(gen);
+    i32 by = biomeY(gen);
     Biome biome = static_cast<Biome>(biomeTypeDist(gen));
 
     return BiomePoint{Vec2i(bx, by), biome};
@@ -89,23 +88,23 @@ private:
 
   void generateWorld()
   {
-    const int numberOfBiomesInWorld = 5;
-    for (int i = 0; i < numberOfBiomesInWorld; ++i)
+    const i32 numberOfBiomesInWorld = 5;
+    for (i32 i = 0; i < numberOfBiomesInWorld; ++i)
     {
       biomePoints.push_back(randomSample());
     }
 
-    for (int y = 0; y < m_nChunks; ++y)
+    for (i32 y = 0; y < m_nChunks; ++y)
     {
-      for (int x = 0; x < m_nChunks; ++x)
+      for (i32 x = 0; x < m_nChunks; ++x)
       {
-        Biome closestBiome = Biome::Grassland;                   // defualt
-        float minDistSqred = std::pow(m_nChunks * m_nChunks, 2); // Huge value at first
+        Biome closestBiome = Biome::Grassland;                 // defualt
+        f32 minDistSqred = std::pow(m_nChunks * m_nChunks, 2); // Huge value at first
 
         // Find closest biome point
         for (const auto &point : biomePoints)
         {
-          float distSqred = point.pos.distanceToSquared(Vec2i(x, y));
+          f32 distSqred = point.pos.distanceToSquared(Vec2i(x, y));
           if (distSqred < minDistSqred)
           {
             minDistSqred = distSqred;
@@ -122,9 +121,9 @@ private:
 
   void printWorld()
   {
-    for (int y = 0; y < m_nChunks; ++y)
+    for (i32 y = 0; y < m_nChunks; ++y)
     {
-      for (int x = 0; x < m_nChunks; ++x)
+      for (i32 x = 0; x < m_nChunks; ++x)
       {
         auto &chunk = chunks[y * m_nChunks + x];
         char c;
@@ -141,7 +140,7 @@ private:
           break;
         }
 
-        for (int i = 0; i < biomePoints.size(); ++i)
+        for (i32 i = 0; i < biomePoints.size(); ++i)
         {
           if (biomePoints[i].pos.x == x && biomePoints[i].pos.y == y)
           {
@@ -179,8 +178,8 @@ public:
   Vec2i worldToNthTile(Vec2f worldPos);
   Vec2f tileToWorld(Vec2i nthChunk, Vec2i nthTile);
 
-  void setChunkTile(Vec2f worldPos, int atlasCode);
-  void setChunkTile(int xthChunk, int ythChunk, int xthTile, int ythTile, int atlasCode);
+  void setChunkTile(Vec2f worldPos, i32 atlasCode);
+  void setChunkTile(i32 xthChunk, i32 ythChunk, i32 xthTile, i32 ythTile, i32 atlasCode);
 
   Chunk *getChunk(Vec2i pos)
   {
@@ -201,9 +200,9 @@ public:
     return t;
   }
 
-  void drawTileGrid(int xthChunk, int ythChunk);
+  void drawTileGrid(i32 xthChunk, i32 ythChunk);
   void drawGrid();
-  void drawChunk(int xthChunk, int ythChunk, Chunk *chunk);
+  void drawChunk(i32 xthChunk, i32 ythChunk, Chunk *chunk);
 
   void update();
   void draw();

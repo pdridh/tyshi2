@@ -1,5 +1,5 @@
-#include "PlayState.hpp"
-#include "MenuState.hpp"
+#include "PlayState.h"
+#include "MenuState.h"
 
 PlayState PlayState::m_self;
 

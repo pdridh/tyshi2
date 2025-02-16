@@ -1,4 +1,4 @@
-#include "World.hpp"
+#include "World.h"
 
 World::World(Engine *game)
     : m_game{game}, gen{555555}
@@ -66,11 +66,11 @@ Vec2f World::tileToWorld(Vec2i nthChunk, Vec2i nthTile)
   return worldPos;
 }
 
-void World::drawTileGrid(int xthChunk, int ythChunk)
+void World::drawTileGrid(i32 xthChunk, i32 ythChunk)
 {
-  for (int ythTile = 0; ythTile < m_nTiles; ++ythTile)
+  for (i32 ythTile = 0; ythTile < m_nTiles; ++ythTile)
   {
-    for (int xthTile = 0; xthTile < m_nTiles; ++xthTile)
+    for (i32 xthTile = 0; xthTile < m_nTiles; ++xthTile)
     {
       Vec2f tilePos = tileToWorld(Vec2i(xthChunk, ythChunk), Vec2i(xthTile, ythTile));
       m_game->camera->drawRect(tilePos, m_tileSize, m_tileSize, {80, 80, 80, 255});
@@ -82,9 +82,9 @@ void World::drawGrid()
 {
 
   // For each chunk
-  for (int ythChunk = 0; ythChunk < m_nChunks; ++ythChunk)
+  for (i32 ythChunk = 0; ythChunk < m_nChunks; ++ythChunk)
   {
-    for (int xthChunk = 0; xthChunk < m_nChunks; ++xthChunk)
+    for (i32 xthChunk = 0; xthChunk < m_nChunks; ++xthChunk)
     {
       // Draw tiles inside chunk
       drawTileGrid(xthChunk, ythChunk);
@@ -99,25 +99,25 @@ void World::drawGrid()
   m_game->camera->drawRect(m_origin, m_chunkSize * m_nChunks, m_chunkSize * m_nChunks, {255, 0, 0, 255});
 }
 
-void World::drawChunk(int xthChunk, int ythChunk, Chunk *chunk)
+void World::drawChunk(i32 xthChunk, i32 ythChunk, Chunk *chunk)
 {
 
-  for (int ythTile = 0; ythTile < m_nTiles; ++ythTile)
+  for (i32 ythTile = 0; ythTile < m_nTiles; ++ythTile)
   {
-    for (int xthTile = 0; xthTile < m_nTiles; ++xthTile)
+    for (i32 xthTile = 0; xthTile < m_nTiles; ++xthTile)
     {
       if (chunk->tiles[ythTile * m_nTiles + xthTile])
       {
         // Vec2f tilePos =
         //     tileToWorld(Vec2i(xthChunk, ythChunk), Vec2i(xthTile, ythTile));
-        // int tileCode = chunk->tiles[ythTile * m_nTiles + xthTile]->atlasCode;
+        // i32 tileCode = chunk->tiles[ythTile * m_nTiles + xthTile]->atlasCode;
         // m_game->camera->drawTexture(tileSheet, atlas[tileCode], tilePos, m_tileSize, m_tileSize);
       }
     }
   }
 }
 
-void World::setChunkTile(Vec2f worldPos, int atlasCode)
+void World::setChunkTile(Vec2f worldPos, i32 atlasCode)
 {
   Vec2i nthChunk = worldToNthChunk(worldPos);
   Vec2i nthTile = worldToNthTile(worldPos);
@@ -125,7 +125,7 @@ void World::setChunkTile(Vec2f worldPos, int atlasCode)
   setChunkTile(nthChunk.x, nthChunk.y, nthTile.x, nthTile.y, atlasCode);
 }
 
-void World::setChunkTile(int xthChunk, int ythChunk, int xthTile, int ythTile, int atlasCode)
+void World::setChunkTile(i32 xthChunk, i32 ythChunk, i32 xthTile, i32 ythTile, i32 atlasCode)
 {
   // auto &chunk = chunks[ythChunk * m_nChunks + xthChunk];
   // if (chunk == nullptr)
@@ -158,9 +158,9 @@ void World::draw()
 
   drawGrid();
 
-  for (int y = 0; y < m_nChunks; ++y)
+  for (i32 y = 0; y < m_nChunks; ++y)
   {
-    for (int x = 0; x < m_nChunks; ++x)
+    for (i32 x = 0; x < m_nChunks; ++x)
     {
       if (chunks[y * m_nChunks + x])
       {

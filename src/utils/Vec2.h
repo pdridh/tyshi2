@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../core/core.h"
+
 #include <iostream>
 #include <type_traits>
 #include <cassert>
@@ -13,7 +15,7 @@ public:
   T x;
   T y;
 
-  static constexpr float DIFFERENCE_TOLERATION = 1e-6;
+  static constexpr f32 DIFFERENCE_TOLERATION = 1e-6;
 
   Vec2<T>(T x_arg = 0, T y_arg = 0) : x(x_arg), y(y_arg)
   {
@@ -63,7 +65,7 @@ public:
 
     if (x || y)
     {
-      float mag = magnitude();
+      f32 mag = magnitude();
 
       x /= mag;
       y /= mag;
@@ -80,22 +82,22 @@ public:
   }
 
   // The magnitude of this vector
-  inline float magnitude() const
+  inline f32 magnitude() const
   {
     return std::sqrt(x * x + y * y);
   }
 
   // Magnitude squared for faster calculations (no sqrt())
-  inline float magnitudeSquared() const { return (x * x) + (y * y); }
+  inline f32 magnitudeSquared() const { return (x * x) + (y * y); }
 
   // Distance from this vector to a vector
-  inline float distanceTo(const Vec2<T> &right) const
+  inline f32 distanceTo(const Vec2<T> &right) const
   {
     return (*this - right).magnitude();
   }
 
   // Distance distance from this vector to a vector
-  inline float distanceToSquared(const Vec2<T> &right) const
+  inline f32 distanceToSquared(const Vec2<T> &right) const
   {
     return (*this - right).magnitudeSquared();
   }
@@ -140,6 +142,11 @@ public:
     return Vec2<T>(x - right.x, y - right.y);
   }
 
+  inline Vec2<T> operator-() const
+  {
+    return Vec2<T>(-x, -y);
+  }
+
   inline Vec2<T> &operator+=(Vec2<T> const &right)
   {
     x += right.x;
@@ -159,8 +166,8 @@ public:
     // Floating comparision
     if (std::is_floating_point_v<T>)
     {
-      float deltaX = std::fabs(x - right.x);
-      float deltaY = std::fabs(y - right.y);
+      f32 deltaX = std::fabs(x - right.x);
+      f32 deltaY = std::fabs(y - right.y);
 
       return deltaX < DIFFERENCE_TOLERATION && deltaY < DIFFERENCE_TOLERATION;
     }
@@ -170,5 +177,5 @@ public:
 };
 
 // Easy access
-typedef Vec2<float> Vec2f;
-typedef Vec2<int> Vec2i;
+typedef Vec2<f32> Vec2f;
+typedef Vec2<i32> Vec2i;

@@ -1,10 +1,10 @@
-#include "Input.hpp"
+#include "Input.h"
 #include <algorithm>
 
 Input::Input()
 {
-  m_keysDownThisFrame.resize(SDL_NUM_SCANCODES, false);
-  m_keysUpThisFrame.resize(SDL_NUM_SCANCODES, false);
+  m_keysDownThisFrame.resize(SDL_SCANCODE_COUNT, false);
+  m_keysUpThisFrame.resize(SDL_SCANCODE_COUNT, false);
   m_buttonMap[SDL_BUTTON_LEFT] = {};
   m_buttonMap[SDL_BUTTON_RIGHT] = {};
   m_buttonMap[SDL_BUTTON_MIDDLE] = {};
@@ -24,12 +24,12 @@ void Input::resetKeyboard()
 
 void Input::handleKeyButtonDown(SDL_KeyboardEvent &e)
 {
-  m_keysDownThisFrame[e.keysym.scancode] = true;
+  m_keysDownThisFrame[e.scancode] = true;
 }
 
 void Input::handleKeyButtonUp(SDL_KeyboardEvent &e)
 {
-  m_keysUpThisFrame[e.keysym.scancode] = true;
+  m_keysUpThisFrame[e.scancode] = true;
 }
 
 bool Input::isKeyDownFrame(SDL_Scancode key) const

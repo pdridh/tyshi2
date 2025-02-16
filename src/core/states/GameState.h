@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Engine.hpp"
+#include "../Engine.h"
 
 // Base class for all game states
 class GameState

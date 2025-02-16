@@ -1,19 +1,17 @@
 #pragma once
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include "core.h"
+
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include <string>
 
-#include "Input.hpp"
-#include "Camera.hpp"
+#include "Input.h"
+#include "Camera.h"
 
 class GameState;
-// #include "../ECS/components/Transform.h"
-// #include "../ECS/components/Movement.h"
-// #include "../ECS/components/Animator.h"
-// #include "../ECS/components/Collider.h"
-// #include "../ECS/EntityManager.h"
 
 // Main engine class that handles the main loop, window creation and frame speed stuff
 // TODO: lots of changes (eg. read config from file and stuff)
@@ -25,27 +23,27 @@ public:
 private:
   // Static
   // TODO read these from configs
-  static const float FIXED_TIMESTEP;
+  static const f32 FIXED_TIMESTEP;
   static const SDL_Color RENDER_CLEAR_COLOR;
-  static const int SCREEN_WIDTH;
-  static const int SCREEN_HEIGHT;
+  static const i32 SCREEN_WIDTH;
+  static const i32 SCREEN_HEIGHT;
 
-  float m_runtime; // Total time the engine ran
+  f32 m_runtime; // Total time the engine ran
 
   bool m_running;
   // Dt related stuff
 
   // Window related stuff
-  int m_windowFlags; // Maybe upgrade to opengl later and stuff
+  i32 m_windowFlags; // Maybe upgrade to opengl later and stuff
   SDL_Window *m_window;
 
   std::vector<GameState *> m_states;
 
 public:
-  float dt;
+  f32 dt;
 
   // Renderer stuff
-  int m_rendererFlags;
+  i32 m_rendererFlags;
 
   SDL_Renderer *m_renderer;
 

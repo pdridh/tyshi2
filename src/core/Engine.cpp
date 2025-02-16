@@ -1,10 +1,10 @@
-#include "Engine.hpp"
-#include "states/PlayState.hpp"
-#include "states/MenuState.hpp"
+#include "Engine.h"
+#include "states/PlayState.h"
+#include "states/MenuState.h"
 
 const SDL_Color Engine::RENDER_CLEAR_COLOR = {0, 0, 0, 255}; // Black clear color
-const int Engine::SCREEN_WIDTH = 800;
-const int Engine::SCREEN_HEIGHT = 600;
+const i32 Engine::SCREEN_WIDTH = 800;
+const i32 Engine::SCREEN_HEIGHT = 600;
 
 Engine::Engine(const std::string &title)
 {
@@ -16,13 +16,13 @@ Engine::Engine(const std::string &title)
   }
 
   // All time related stuff in seconds
-  float lastTime = SDL_GetTicks() / 1000.0;
+  f32 lastTime = SDL_GetTicks() / 1000.0;
 
   // main loop
   while (m_running)
   {
-    float newTime = SDL_GetTicks() / 1000.0;
-    float elapsedTime = newTime - lastTime;
+    f32 newTime = SDL_GetTicks() / 1000.0;
+    f32 elapsedTime = newTime - lastTime;
     lastTime = newTime;
     processInput();
     dt = elapsedTime;
@@ -34,35 +34,27 @@ Engine::Engine(const std::string &title)
 
 bool Engine::init(const std::string &title)
 {
-  if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+  if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) < 0)
   {
     printf("Engine::init - Failed to init SDL: %s\n", SDL_GetError());
     return false;
   }
 
-  if (!IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG))
-  {
-    printf("Engine::init - Failed to initialize IMG_Init: %s\n", IMG_GetError());
-    return false;
-  }
-
   m_windowFlags = SDL_WINDOW_RESIZABLE;
   // TODO change how the window size works
-  m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, m_windowFlags);
+  bool success = SDL_CreateWindowAndRenderer(title.c_str(),
+                                             SCREEN_WIDTH, SCREEN_HEIGHT,
+                                             m_windowFlags, &m_window, &m_renderer);
 
-  if (!m_window)
+  if (!success)
   {
-    printf("Engine::init - Failed to create window: %s\n", SDL_GetError());
+    printf("Engine::init - Failed to create window and renderer: %s\n", SDL_GetError());
     return false;
   }
 
-  m_renderer = SDL_CreateRenderer(m_window, -1, m_rendererFlags);
-
-  if (!m_renderer)
-  {
-    printf("Engine::init - Failed to create renderer: %s\n", SDL_GetError());
-    return false;
-  }
+  const char *version = "2.0.0";
+  const char *appid = "com.tyshi.tyshi2";
+  SDL_SetAppMetadata(title.c_str(), version, appid);
 
   camera = new Camera(m_renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -83,23 +75,23 @@ void Engine::processInput()
   {
     switch (event.type)
     {
-    case SDL_QUIT:
+    case SDL_EVENT_QUIT:
       m_running = false;
       break;
-    case SDL_KEYDOWN:
+    case SDL_EVENT_KEY_DOWN:
       input.handleKeyButtonDown(event.key);
       break;
-    case SDL_KEYUP:
+    case SDL_EVENT_KEY_UP:
       input.handleKeyButtonUp(event.key);
       break;
-    case SDL_MOUSEWHEEL:
+    case SDL_EVENT_MOUSE_WHEEL:
       // event
       input.handleMouseWheel(event.wheel);
       break;
-    case SDL_MOUSEBUTTONUP:
+    case SDL_EVENT_MOUSE_BUTTON_UP:
       input.handleMouseButtonUp(event.button);
       break;
-    case SDL_MOUSEBUTTONDOWN:
+    case SDL_EVENT_MOUSE_BUTTON_DOWN:
       input.handleMouseButtonDown(event.button);
       break;
     default:

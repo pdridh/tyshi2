@@ -1,14 +1,8 @@
-#include <SDL2/SDL.h>
-
-#include "core/Engine.hpp"
-
+#include "core/Engine.h"
 #include <random>
-#include <time.h>
 
-int main()
+int main(int argc, char *argv[])
 {
-  srand(time(NULL));
   Engine *eng = new Engine("Tyshi");
-
   return 0;
 }

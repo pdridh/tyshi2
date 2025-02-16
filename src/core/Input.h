@@ -1,8 +1,8 @@
 #pragma once
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
-#include "../utils/Vec2.hpp"
+#include "../utils/Vec2.h"
 
 #include <unordered_map>
 #include <vector>
@@ -27,8 +27,8 @@ private:
   std::unordered_map<MouseButton, MouseButtonState> m_buttonMap;
   std::vector<bool> m_keysDownThisFrame;
   std::vector<bool> m_keysUpThisFrame;
-  const Uint8 *m_keyboardState;
-  int mouseWheelY;
+  const bool *m_keyboardState;
+  i32 mouseWheelY;
 
 private:
   // Reset keysdown and keysup this frame
@@ -96,7 +96,7 @@ public:
   /// @return boolean based on the state
   bool isMouseReleased(MouseButton btn) const;
 
-  int mouseScroll() const { return mouseWheelY; }
+  i32 mouseScroll() const { return mouseWheelY; }
 
   /// @return The position that this btn was clicked on
   const Vec2f getMouseClickPosition(MouseButton btn) const

@@ -1,6 +1,6 @@
-#include "Camera.hpp"
+#include "Camera.h"
 
-Camera::Camera(SDL_Renderer *renderer, float width, float height)
+Camera::Camera(SDL_Renderer *renderer, f32 width, f32 height)
     : m_renderer{renderer}, m_width{width}, m_height{height}
 {
   centerOn(Vec2f::ZERO());
@@ -23,7 +23,7 @@ Vec2f Camera::worldToScreen(Vec2f worldPos)
   return worldPos - m_center;
 }
 
-void Camera::drawRect(Vec2f worldPos, float width, float height, Color color, bool filled)
+void Camera::drawRect(Vec2f worldPos, f32 width, f32 height, Color color, bool filled)
 {
   SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
 
@@ -35,19 +35,19 @@ void Camera::drawRect(Vec2f worldPos, float width, float height, Color color, bo
                     height};
   if (filled)
   {
-    SDL_RenderFillRectF(m_renderer, &rect);
+    SDL_RenderFillRect(m_renderer, &rect);
     return;
   }
 
-  SDL_RenderDrawRectF(m_renderer, &rect);
+  SDL_RenderRect(m_renderer, &rect);
 }
 
-void Camera::drawRect(float worldX, float worldY, float width, float height, Color color, bool filled)
+void Camera::drawRect(f32 worldX, f32 worldY, f32 width, f32 height, Color color, bool filled)
 {
   drawRect(Vec2f(worldX, worldY), width, height, color, filled);
 }
 
-void Camera::drawTexture(SDL_Texture *texture, SDL_Rect &srcRect, Vec2f worldPos, float width, float height, bool trans)
+void Camera::drawTexture(SDL_Texture *texture, SDL_FRect &srcRect, Vec2f worldPos, f32 width, f32 height, bool trans)
 {
   Vec2f screenPos = worldToScreen(Vec2f(worldPos.x - width / 2, worldPos.y - height / 2));
   SDL_FRect dstRect = {screenPos.x, screenPos.y, width, height};
@@ -55,5 +55,5 @@ void Camera::drawTexture(SDL_Texture *texture, SDL_Rect &srcRect, Vec2f worldPos
   {
     SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
   }
-  SDL_RenderCopyExF(m_renderer, texture, &srcRect, &dstRect, 0, NULL, SDL_FLIP_NONE);
+  SDL_RenderTexture(m_renderer, texture, &srcRect, &dstRect);
 }
