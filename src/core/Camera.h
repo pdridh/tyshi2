@@ -1,7 +1,8 @@
 #pragma once
 
-#include <SDL3/SDL.h>
+#include "Core.h"
 
+#include <SDL3/SDL.h>
 #include "../utils/Vec2.h"
 
 struct Color

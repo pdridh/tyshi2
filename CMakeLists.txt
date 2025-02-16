@@ -65,13 +65,6 @@ add_pkg(SDL3 sdl3)
 add_pkg(SDL3_IMAGE sdl3-image)
 add_pkg(SDL3_TTF sdl3-ttf)
 
-
-target_include_directories(app PRIVATE ${ALL_INCLUDE_DIRS})
-target_link_directories(app PRIVATE ${ALL_LIBRARY_DIRS})
-target_link_libraries(app PRIVATE ${ALL_LIBRARIES} -static-libstdc++ -static-libgcc)
-target_link_options(app PRIVATE ${ALL_LDFLAGS})
-target_compile_options(app PRIVATE ${ALL_CFLAGS})
-
 #Compiler options
 target_compile_definitions(app PRIVATE 
     $<$<CONFIG:Debug>:DEBUG_BUILD> 
@@ -79,6 +72,19 @@ target_compile_definitions(app PRIVATE
 )
 
 target_compile_features(${app_name} PRIVATE cxx_std_17)
+
+if(CMAKE_TOOLCHAIN_FILE)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        # If its debug build then we DO want the console for windows 
+        list(FILTER ALL_LDFLAGS EXCLUDE REGEX ".*-mwindows.*")
+    endif()
+endif()
+
+target_include_directories(app PRIVATE ${ALL_INCLUDE_DIRS})
+target_link_directories(app PRIVATE ${ALL_LIBRARY_DIRS})
+target_link_libraries(app PRIVATE ${ALL_LIBRARIES} -static-libstdc++ -static-libgcc)
+target_link_options(app PRIVATE ${ALL_LDFLAGS})
+target_compile_options(app PRIVATE ${ALL_CFLAGS})
 
 install(TARGETS app RUNTIME DESTINATION ${FINAL_BIN_DIR})
 file(COPY assets DESTINATION ${FINAL_BIN_DIR})

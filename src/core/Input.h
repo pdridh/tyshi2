@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-typedef u_int8_t MouseButton;
+typedef u8 MouseButton;
 
 /// @brief States that a mouse button can have
 struct MouseButtonState

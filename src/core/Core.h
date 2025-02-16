@@ -1,6 +1,13 @@
 #pragma once
 
 #include <cstdint>
+#include <stdio.h>
+
+#if WIN32
+#include <windows.h>
+#else
+#include <sys/mman.h>
+#endif
 
 #if DEBUG_BUILD
 #define Assert(Expression) \
@@ -28,3 +35,11 @@ typedef int64_t i64;
 
 typedef float f32;
 typedef double f64;
+
+#define Kilobytes(Value) ((Value) * 1024LL)
+#define Megabytes(Value) (Kilobytes(Value) * 1024LL)
+#define Gigabytes(Value) (Megabytes(Value) * 1024LL)
+#define Terabytes(Value) (Gigabytes(Value) * 1024LL)
+
+void *gameMemoryGet(size_t len);
+void gameMemoryFree(void *ptr, size_t len);

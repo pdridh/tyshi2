@@ -1,7 +1,5 @@
 #pragma once
 
-#include "core.h"
-
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
@@ -12,6 +10,14 @@
 #include "Camera.h"
 
 class GameState;
+
+struct GameMemory
+{
+  u64 persistentStorageSize;
+  void *persistentStorage;
+  u64 transientStorageSize;
+  void *transientStorage;
+};
 
 // Main engine class that handles the main loop, window creation and frame speed stuff
 // TODO: lots of changes (eg. read config from file and stuff)
@@ -47,6 +53,7 @@ public:
 
   SDL_Renderer *m_renderer;
 
+  GameMemory m_memory;
   Input input;
   Camera *camera;
 

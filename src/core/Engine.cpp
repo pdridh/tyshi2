@@ -56,6 +56,13 @@ bool Engine::init(const std::string &title)
   const char *appid = "com.tyshi.tyshi2";
   SDL_SetAppMetadata(title.c_str(), version, appid);
 
+  m_memory = {};
+  m_memory.persistentStorageSize = Megabytes(64);
+  m_memory.transientStorageSize = Gigabytes(2);
+
+  m_memory.persistentStorage = gameMemoryGet(m_memory.persistentStorageSize);
+  m_memory.transientStorage = gameMemoryGet(m_memory.transientStorageSize);
+
   camera = new Camera(m_renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 
   changeState(MenuState::instance());
@@ -175,6 +182,11 @@ void Engine::render()
 
 void Engine::clean()
 {
+
+  // free stuff
+  gameMemoryFree(m_memory.persistentStorage, m_memory.persistentStorageSize);
+  gameMemoryFree(m_memory.transientStorage, m_memory.transientStorageSize);
+
   // TODO
   // Delete memory stuff
   // Handle everything
