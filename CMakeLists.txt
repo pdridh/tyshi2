@@ -15,15 +15,22 @@ file(GLOB_RECURSE SOURCE_FILES
 
 add_executable(${app_name} ${SOURCE_FILES})
 
+
 # If theres a toolchain file we are auto assuming
 # build for windows we dont give a fuck
 if(CMAKE_TOOLCHAIN_FILE)
     message(STATUS "Building for Windows")
+
+    set(FINAL_BIN_DIR "${CMAKE_SOURCE_DIR}/bin/win_bin")
+
     # MINGW requires different options so set different pkgconfig path for mingw 
     set(ENV{PKG_CONFIG_PATH} "/usr/local/x86_64-w64-mingw32/lib/pkgconfig")
+    #install dlls for windows
+    install(DIRECTORY libs/ DESTINATION ${FINAL_BIN_DIR})
 else()
     # we auto building for linux (probably not supporting any other platforms idk)
     message(STATUS "Building for Linux/Default")
+    set(FINAL_BIN_DIR "${CMAKE_SOURCE_DIR}/bin/linux_bin")
 endif()
 
 find_package(PkgConfig REQUIRED)
@@ -61,7 +68,7 @@ add_pkg(SDL3_TTF sdl3-ttf)
 
 target_include_directories(app PRIVATE ${ALL_INCLUDE_DIRS})
 target_link_directories(app PRIVATE ${ALL_LIBRARY_DIRS})
-target_link_libraries(app PRIVATE ${ALL_LIBRARIES})
+target_link_libraries(app PRIVATE ${ALL_LIBRARIES} -static-libstdc++ -static-libgcc)
 target_link_options(app PRIVATE ${ALL_LDFLAGS})
 target_compile_options(app PRIVATE ${ALL_CFLAGS})
 
@@ -73,4 +80,5 @@ target_compile_definitions(app PRIVATE
 
 target_compile_features(${app_name} PRIVATE cxx_std_17)
 
-file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
+install(TARGETS app RUNTIME DESTINATION ${FINAL_BIN_DIR})
+file(COPY assets DESTINATION ${FINAL_BIN_DIR})
