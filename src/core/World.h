@@ -4,14 +4,29 @@
 
 #include "Engine.h"
 
-#include <vector>
 #include <random>
 #include <algorithm>
+#include <cassert>
+
+static constexpr int CHUNKS_DIM = 4;
+static constexpr int TOTAL_CHUNKS = CHUNKS_DIM * CHUNKS_DIM;
+static constexpr int NUMBER_OF_BIOME_PTS = 5;
+static constexpr int TILES_PER_CHUNK_DIM = 4;
+static constexpr int TOTAL_TILES_PER_CHUNK = TILES_PER_CHUNK_DIM * TILES_PER_CHUNK_DIM;
 
 struct Tile
 {
+  Vec2i position;
+  Vec2i nthChunk;
   i32 atlasCode;
-  Tile(i32 code = -1) : atlasCode{code} {}
+};
+
+struct Player
+{
+  Vec2f pos;
+  f32 speed;
+  i32 squareSize = 24;
+  i32 textureID; // TODO idk how itll shape out but needs a texture fs
 };
 
 enum TileType
@@ -30,22 +45,9 @@ enum Biome
 
 struct Chunk
 {
-
-  std::vector<Tile *> tiles;
-  Biome closestBiome;
-  Chunk(f32 nTiles, Biome b)
-      : closestBiome{b}
-  {
-    // Storing 2d in 1d
-    tiles.resize(nTiles * nTiles);
-  }
-};
-
-struct WorldPosition
-{
-  Vec2i absoluteChunkPos;
-  Vec2i absoluteTilePos;
-  Vec2f relTilePos;
+  Vec2i position;
+  Biome biome;
+  Tile *tiles[TOTAL_TILES_PER_CHUNK];
 };
 
 struct BiomePoint
@@ -58,9 +60,7 @@ class World
 {
 private:
   i32 m_chunkSize;
-  i32 m_nChunks;
   i32 m_worldSize;
-  i32 m_nTiles;
   i32 m_tileSize;
 
   Engine *m_game;
@@ -70,139 +70,83 @@ private:
   std::uniform_int_distribution<> biomeY;
   std::uniform_int_distribution<> biomeTypeDist;
 
-  std::vector<Chunk *> chunks = {};
-  std::vector<BiomePoint> biomePoints;
+  Chunk *chunks[TOTAL_CHUNKS];
+  BiomePoint biomePoints[NUMBER_OF_BIOME_PTS];
 
   Vec2f m_origin;
-  Vec2f m_topLeft;
+
+  Player *player;
 
 private:
-  BiomePoint randomSample()
-  {
-    i32 bx = biomeX(gen);
-    i32 by = biomeY(gen);
-    Biome biome = static_cast<Biome>(biomeTypeDist(gen));
-
-    return BiomePoint{Vec2i(bx, by), biome};
-  }
-
-  void generateWorld()
-  {
-    const i32 numberOfBiomesInWorld = 5;
-    for (i32 i = 0; i < numberOfBiomesInWorld; ++i)
-    {
-      biomePoints.push_back(randomSample());
-    }
-
-    for (i32 y = 0; y < m_nChunks; ++y)
-    {
-      for (i32 x = 0; x < m_nChunks; ++x)
-      {
-        Biome closestBiome = Biome::Grassland;                 // defualt
-        f32 minDistSqred = std::pow(m_nChunks * m_nChunks, 2); // Huge value at first
-
-        // Find closest biome point
-        for (const auto &point : biomePoints)
-        {
-          f32 distSqred = point.pos.distanceToSquared(Vec2i(x, y));
-          if (distSqred < minDistSqred)
-          {
-            minDistSqred = distSqred;
-            closestBiome = point.biome;
-          }
-        }
-
-        chunks[y * m_nChunks + x] = new Chunk(m_nTiles, closestBiome);
-      }
-    }
-
-    printWorld();
-  }
-
-  void printWorld()
-  {
-    for (i32 y = 0; y < m_nChunks; ++y)
-    {
-      for (i32 x = 0; x < m_nChunks; ++x)
-      {
-        auto &chunk = chunks[y * m_nChunks + x];
-        char c;
-        switch (chunk->closestBiome)
-        {
-        case Biome::Grassland:
-          c = 'G';
-          break;
-        case Biome::Forest:
-          c = 'F';
-          break;
-        case Biome::Rocky:
-          c = 'R';
-          break;
-        }
-
-        for (i32 i = 0; i < biomePoints.size(); ++i)
-        {
-          if (biomePoints[i].pos.x == x && biomePoints[i].pos.y == y)
-          {
-            printf("C");
-            break;
-          }
-        }
-
-        printf("%c\t", c);
-      }
-      printf("\n");
-    }
-  }
-
 public:
   World(Engine *game);
-  ~World()
-  {
-    for (auto &c : chunks)
-    {
-      for (auto &t : c->tiles)
-      {
-        if (t)
-        {
-          delete t;
-        }
-      }
-      delete c;
-    }
-  }
+  ~World();
 
-  Vec2i worldToNthChunk(Vec2f worldPos);
-  Vec2f worldToChunk(Vec2f worldPos);
+  // ***************************** Generation related stuff ****************** //
 
-  Vec2i worldToNthTile(Vec2f worldPos);
-  Vec2f tileToWorld(Vec2i nthChunk, Vec2i nthTile);
+  BiomePoint randomSample();
+  void generateChunkTiles(Chunk *chunky);
+  Chunk *createChunk(Vec2i pos);
+  void generateWorld();
+  void printWorld();
+
+  // **************************** Coordinate conversions *******************//
+
+  // Convert from world position to a chunk (x,y)
+  // not relative to anything
+  Vec2i worldToAbsChunk(Vec2f worldPos);
+
+  // Convert from a chunk(x,y) to world position
+  Vec2f absChunkToWorld(Vec2i nthChunk);
+
+  // Convert from world position to a tile not bounded by any chunk
+  // THIS can range above the tile per chunk value
+  Vec2i worldToAbsTile(Vec2f worldPos);
+
+  // Convert from world position to a tile INSIDE a chunk
+  // this coordinate can only range from 0,0 to the tile per chunk value
+  Vec2i worldToChunkTile(Vec2f worldPos);
+
+  // Convert absolute tile, i.e, a tile unbounded by any chunk to world position
+  Vec2f absTileToWorld(Vec2i absTile);
+
+  // Convert a chunk(x,y)'s tile(xt, yt) to a world position
+  Vec2f chunkTileToWorld(Vec2i nthChunk, Vec2i nthTile);
 
   void setChunkTile(Vec2f worldPos, i32 atlasCode);
   void setChunkTile(i32 xthChunk, i32 ythChunk, i32 xthTile, i32 ythTile, i32 atlasCode);
 
-  Chunk *getChunk(Vec2i pos)
-  {
-    // TODO Assert that this position is valid
-    return chunks[pos.y * m_nChunks + pos.x];
-  }
+  // Get the reference to the ptr in chunks[]
+  // by the absolute (x,y) of a chunk
+  // If a chunk exists it returns it otherwise
+  // creates the chunk using createChunk() and returns it
+  Chunk *&getChunk(Vec2i nthChunk);
+
+  // Get reference to the ptr in chunks[] directly by
+  // a worldPos, converts the worldPos to an absolute chunk
+  // and calls getChunk() internally (meaning this can create a chunk too)
+  Chunk *&getChunkAtWorldPos(Vec2f worldPos);
 
   Tile *getTileFromChunk(Chunk *c, Vec2i tilePos)
   {
-    // TODO assert that this tile position is valid and "containbale type shit"
-    return c->tiles[tilePos.y * m_nTiles + tilePos.x];
+
+    assert(tilePos.x >= 0 &&
+           tilePos.y >= 0 &&
+           tilePos.x < TILES_PER_CHUNK_DIM &&
+           tilePos.y < TILES_PER_CHUNK_DIM);
+
+    return c->tiles[tilePos.y * TILES_PER_CHUNK_DIM + tilePos.x];
   }
 
-  Tile *getTile(WorldPosition pos)
-  {
-    Chunk *c = getChunk(pos.absoluteChunkPos);
-    Tile *t = getTileFromChunk(c, pos.absoluteTilePos);
-    return t;
-  }
-
-  void drawTileGrid(i32 xthChunk, i32 ythChunk);
+  void drawGridTile(i32 xthChunk, i32 ythChunk);
   void drawGrid();
-  void drawChunk(i32 xthChunk, i32 ythChunk, Chunk *chunk);
+
+  void drawChunk(Chunk *chunk);
+  void drawTile(Tile *tile);
+
+  // Player stuff
+  void updatePlayer();
+  void drawPlayer();
 
   void update();
   void draw();
