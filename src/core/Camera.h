@@ -20,6 +20,7 @@ private:
   SDL_Renderer *m_renderer;
   f32 m_width;
   f32 m_height;
+  f32 zoom;
 
 public:
   Camera(SDL_Renderer *renderer, f32 width, f32 height);
