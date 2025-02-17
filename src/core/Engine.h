@@ -68,6 +68,8 @@ private:
   // Initialize helper function for constructor to init stuff
   bool init(const std::string &window_title);
 
+  void clearTransientStorage();
+
   // Process and handle input events
   void processInput();
 

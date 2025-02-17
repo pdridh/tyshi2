@@ -21,6 +21,9 @@ Engine::Engine(const std::string &title)
   // main loop
   while (m_running)
   {
+    // zero out the transient storage at the start of every frame
+    clearTransientStorage();
+
     f32 newTime = SDL_GetTicks() / 1000.0;
     f32 elapsedTime = newTime - lastTime;
     lastTime = newTime;
@@ -56,18 +59,28 @@ bool Engine::init(const std::string &title)
   const char *appid = "com.tyshi.tyshi2";
   SDL_SetAppMetadata(title.c_str(), version, appid);
 
+  // TODO ACTUALLY USE THIS IDK
   m_memory = {};
   m_memory.persistentStorageSize = Megabytes(64);
-  m_memory.transientStorageSize = Gigabytes(2);
+  m_memory.transientStorageSize = Megabytes(128);
 
-  m_memory.persistentStorage = gameMemoryGet(m_memory.persistentStorageSize);
-  m_memory.transientStorage = gameMemoryGet(m_memory.transientStorageSize);
+  m_memory.persistentStorage = allocateMemory(m_memory.persistentStorageSize);
+  m_memory.transientStorage = allocateMemory(m_memory.transientStorageSize);
 
   camera = new Camera(m_renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 
   changeState(MenuState::instance());
 
   return true;
+}
+
+void Engine::clearTransientStorage()
+{
+  if (m_memory.transientStorage)
+  {
+    // Zero out the transient storage
+    memset(m_memory.transientStorage, 0, m_memory.transientStorageSize);
+  }
 }
 
 void Engine::processInput()
@@ -184,11 +197,16 @@ void Engine::clean()
 {
 
   // free stuff
-  gameMemoryFree(m_memory.persistentStorage, m_memory.persistentStorageSize);
-  gameMemoryFree(m_memory.transientStorage, m_memory.transientStorageSize);
+  if (m_memory.persistentStorage != nullptr)
+  {
+    freeAllocatedMemory(m_memory.persistentStorage, m_memory.persistentStorageSize);
+  }
 
-  // TODO
-  // Delete memory stuff
-  // Handle everything
-  // quit sdl and img shit
+  if (m_memory.transientStorage != nullptr)
+  {
+    freeAllocatedMemory(m_memory.transientStorage, m_memory.transientStorageSize);
+  }
+
+  TTF_Quit();
+  SDL_Quit();
 }
