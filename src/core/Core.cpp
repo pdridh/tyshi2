@@ -1,6 +1,6 @@
 #include "Core.h"
 
-void *gameMemoryGet(size_t len)
+void *allocateMemory(size_t len)
 {
   void *mem;
 #if WIN32
@@ -14,7 +14,7 @@ void *gameMemoryGet(size_t len)
   return mem;
 }
 
-void gameMemoryFree(void *ptr, size_t len)
+void freeAllocatedMemory(void *ptr, size_t len)
 {
 #if WIN32
   VirtualFree(NULL, 0, MEM_RELEASE);
