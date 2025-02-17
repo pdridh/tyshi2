@@ -30,4 +30,5 @@ public:
   void drawRect(Vec2f worldPos, f32 width, f32 height, Color color, bool filled = false);
   void drawRect(f32 worldX, f32 worldY, f32 width, f32 height, Color color, bool filled = false);
   void drawTexture(SDL_Texture *texture, SDL_FRect &srcRect, Vec2f worldPos, f32 width, f32 height, bool trans);
+  void drawPoint(f32 x, f32 y, Color c);
 };

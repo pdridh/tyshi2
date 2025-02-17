@@ -68,3 +68,10 @@ void Camera::drawTexture(SDL_Texture *texture, SDL_FRect &srcRect, Vec2f worldPo
   }
   SDL_RenderTexture(m_renderer, texture, &srcRect, &dstRect);
 }
+
+void Camera::drawPoint(f32 x, f32 y, Color c)
+{
+  Vec2f screen = worldToScreen(Vec2f(x, y));
+  SDL_SetRenderDrawColor(m_renderer, c.r, c.g, c.b, c.a);
+  SDL_RenderPoint(m_renderer, screen.x, screen.y);
+}
