@@ -10,14 +10,15 @@ PlayState *PlayState::instance()
 
 void PlayState::onEnter(Engine *game)
 {
-  world = new World(game);
   printf("Entering play...\n");
+  world = new World(game);
 }
 
 void PlayState::onExit()
 {
-  delete world;
   printf("Exiting play...\n");
+  delete world;
+  world = nullptr;
 }
 
 void PlayState::pause()
@@ -34,8 +35,17 @@ void PlayState::update(Engine *game)
   {
     game->changeState(MenuState::instance());
   }
+
+  if (world)
+  {
+    world->update();
+  }
 }
 
 void PlayState::draw(Engine *game)
 {
+  if (world)
+  {
+    world->draw();
+  }
 }

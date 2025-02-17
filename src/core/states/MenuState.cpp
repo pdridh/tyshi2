@@ -10,7 +10,6 @@ MenuState *MenuState::instance()
 
 void MenuState::onEnter(Engine *game)
 {
-
   printf("Entering menu...\n");
 }
 
