@@ -3,11 +3,14 @@
 #include "states/MenuState.h"
 
 const SDL_Color Engine::RENDER_CLEAR_COLOR = {0, 0, 0, 255}; // Black clear color
-const i32 Engine::SCREEN_WIDTH = 800;
-const i32 Engine::SCREEN_HEIGHT = 600;
 
 Engine::Engine(const std::string &title)
 {
+  // Only at start
+  // TODO change this to some better way (settings file?, fullscreen auto? idk)
+  m_screenWidth = 800;
+  m_screenHeight = 600;
+
   m_running = true;
   if (!init(title))
   {
@@ -46,7 +49,7 @@ bool Engine::init(const std::string &title)
   m_windowFlags = SDL_WINDOW_RESIZABLE;
   // TODO change how the window size works
   bool success = SDL_CreateWindowAndRenderer(title.c_str(),
-                                             SCREEN_WIDTH, SCREEN_HEIGHT,
+                                             m_screenWidth, m_screenHeight,
                                              m_windowFlags, &m_window, &m_renderer);
 
   if (!success)
@@ -67,7 +70,7 @@ bool Engine::init(const std::string &title)
   m_memory.persistentStorage = allocateMemory(m_memory.persistentStorageSize);
   m_memory.transientStorage = allocateMemory(m_memory.transientStorageSize);
 
-  camera = new Camera(m_renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+  camera = new Camera(m_renderer, m_screenWidth, m_screenHeight);
 
   changeState(MenuState::instance());
 
@@ -81,6 +84,12 @@ void Engine::clearTransientStorage()
     // Zero out the transient storage
     memset(m_memory.transientStorage, 0, m_memory.transientStorageSize);
   }
+}
+
+void Engine::handleScreenResizeEvent()
+{
+  SDL_GetWindowSizeInPixels(m_window, &m_screenWidth, &m_screenHeight);
+  camera->setCameraSize(m_screenWidth, m_screenHeight);
 }
 
 void Engine::processInput()
@@ -113,6 +122,9 @@ void Engine::processInput()
       break;
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
       input.handleMouseButtonDown(event.button);
+      break;
+    case SDL_EVENT_WINDOW_RESIZED:
+      handleScreenResizeEvent();
       break;
     default:
       break;

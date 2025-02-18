@@ -20,13 +20,22 @@ private:
   SDL_Renderer *m_renderer;
   f32 m_width;
   f32 m_height;
-  f32 zoom;
+  f32 m_zoom;
 
 public:
   Camera(SDL_Renderer *renderer, f32 width, f32 height);
+
+  //****** CAMERA STUFF */
+  void setCameraSize(f32 width, f32 height);
   void centerOn(Vec2f centerPos);
+  void setZoom(f32 zoom);
+  void zoomBy(f32 scale);
+
+  //************** CONVERSIONS */
   Vec2f screenToWorld(Vec2f screenPos);
   Vec2f worldToScreen(Vec2f worldPos);
+
+  //*********** DRAWING STUFF */
   void drawRect(Vec2f worldPos, f32 width, f32 height, Color color, bool filled = false);
   void drawRect(f32 worldX, f32 worldY, f32 width, f32 height, Color color, bool filled = false);
   void drawTexture(SDL_Texture *texture, SDL_FRect &srcRect, Vec2f worldPos, f32 width, f32 height, bool trans);

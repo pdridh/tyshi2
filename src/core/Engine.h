@@ -31,8 +31,8 @@ private:
   // TODO read these from configs
   static const f32 FIXED_TIMESTEP;
   static const SDL_Color RENDER_CLEAR_COLOR;
-  static const i32 SCREEN_WIDTH;
-  static const i32 SCREEN_HEIGHT;
+  i32 m_screenWidth;
+  i32 m_screenHeight;
 
   f32 m_runtime; // Total time the engine ran
 
@@ -70,6 +70,7 @@ private:
 
   void clearTransientStorage();
 
+  void handleScreenResizeEvent();
   // Process and handle input events
   void processInput();
 

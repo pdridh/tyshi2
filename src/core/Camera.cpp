@@ -1,20 +1,46 @@
 #include "Camera.h"
 
 Camera::Camera(SDL_Renderer *renderer, f32 width, f32 height)
-    : m_renderer{renderer}, m_width{width}, m_height{height}, zoom{5.f}
+    : m_renderer{renderer}, m_width{width}, m_height{height}, m_zoom{1.f}
 {
   centerOn(Vec2f::ZERO());
+}
+
+void Camera::setCameraSize(f32 width, f32 height)
+{
+  m_width = width;
+  m_height = height;
 }
 
 void Camera::centerOn(Vec2f centerPosInWorld)
 {
   m_center = centerPosInWorld;
+
+  if (m_center.x < m_width / 2 / m_zoom)
+    m_center.x = m_width / 2 / m_zoom;
+  else if (m_center.x > 10000)
+    m_center.x = 10000;
+
+  if (m_center.y < m_height / 2 / m_zoom)
+    m_center.y = m_height / 2 / m_zoom;
+  else if (m_center.y > 10000)
+    m_center.y = 10000;
+}
+
+void Camera::setZoom(f32 zoom)
+{
+  m_zoom = zoom;
+}
+
+void Camera::zoomBy(f32 scale)
+{
+  m_zoom *= scale;
 }
 
 Vec2f Camera::screenToWorld(Vec2f screenPos)
 {
   Vec2f worldPos = screenPos - Vec2f(m_width / 2, m_height / 2);
-  worldPos.scaleDown(zoom);
+  worldPos.scaleDown(m_zoom);
   worldPos.y *= -1;
   worldPos += m_center;
   return worldPos;
@@ -24,7 +50,7 @@ Vec2f Camera::worldToScreen(Vec2f worldPos)
 {
   Vec2f screenPos = worldPos - m_center;
   screenPos.y *= -1;
-  screenPos.scale(zoom);
+  screenPos.scale(m_zoom);
   screenPos += Vec2f(m_width / 2, m_height / 2);
   return screenPos;
 }
@@ -33,8 +59,8 @@ void Camera::drawRect(Vec2f worldPos, f32 width, f32 height, Color color, bool f
 {
   SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
 
-  width = width * zoom;
-  height = height * zoom;
+  width = width * m_zoom;
+  height = height * m_zoom;
 
   Vec2f screenPos = worldToScreen(worldPos);
 
@@ -60,12 +86,18 @@ void Camera::drawRect(f32 worldX, f32 worldY, f32 width, f32 height, Color color
 
 void Camera::drawTexture(SDL_Texture *texture, SDL_FRect &srcRect, Vec2f worldPos, f32 width, f32 height, bool trans)
 {
-  Vec2f screenPos = worldToScreen(Vec2f(worldPos.x - width / 2, worldPos.y - height / 2));
+  width = width * m_zoom;
+  height = height * m_zoom;
+
+  Vec2f screenPos = worldToScreen(worldPos);
+  screenPos -= Vec2f(width / 2, height / 2);
+
   SDL_FRect dstRect = {screenPos.x, screenPos.y, width, height};
   if (trans)
   {
     SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
   }
+
   SDL_RenderTexture(m_renderer, texture, &srcRect, &dstRect);
 }
 
