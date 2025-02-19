@@ -9,6 +9,7 @@
 #include <cassert>
 #include <unordered_map>
 #include <string>
+static constexpr int CHUNKS_DIM = 16;
 static constexpr int TOTAL_CHUNKS = CHUNKS_DIM * CHUNKS_DIM;
 static constexpr int NUMBER_OF_BIOME_PTS = 5;
 static constexpr int TILES_PER_CHUNK_DIM = 4;
