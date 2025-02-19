@@ -67,6 +67,7 @@ struct BiomePoint
 class World
 {
 private:
+  u8 m_renderDistance;
   i32 m_chunkSize;
   i32 m_worldSize;
   i32 m_tileSize;

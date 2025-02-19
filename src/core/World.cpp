@@ -7,6 +7,7 @@ World::World(Engine *game)
 
   m_worldSize = CHUNKS_DIM * m_chunkSize;
   m_tileSize = m_chunkSize / TILES_PER_CHUNK_DIM;
+  m_renderDistance = 3;
 
   biomeX = std::uniform_int_distribution<>(0, CHUNKS_DIM - 1);
   biomeY = std::uniform_int_distribution<>(0, CHUNKS_DIM - 1);
@@ -296,11 +297,21 @@ void World::drawGridTile(i32 xthChunk, i32 ythChunk)
 void World::drawGrid()
 {
 
+  Vec2i playerChunk = player->position.nthChunk;
+
   // For each chunk
-  for (i32 ythChunk = 0; ythChunk < CHUNKS_DIM; ++ythChunk)
+  for (i32 ythChunk = -m_renderDistance; ythChunk <= m_renderDistance; ++ythChunk)
   {
-    for (i32 xthChunk = 0; xthChunk < CHUNKS_DIM; ++xthChunk)
+    for (i32 xthChunk = -m_renderDistance; xthChunk <= m_renderDistance; ++xthChunk)
     {
+      Vec2i renderChunk = playerChunk + Vec2i(xthChunk, ythChunk);
+
+      if (renderChunk.x >= CHUNKS_DIM ||
+          renderChunk.y >= CHUNKS_DIM ||
+          renderChunk.x < 0 ||
+          renderChunk.y < 0)
+        continue;
+
       // Draw tiles inside chunk
       drawGridTile(xthChunk, ythChunk);
       // Draw the chunk
@@ -322,7 +333,6 @@ void World::drawChunk(Vec2i nthChunk)
 
 void World::drawChunk(Chunk *chunk)
 {
-  int x = 0;
   for (i32 ythTile = 0; ythTile < TILES_PER_CHUNK_DIM; ++ythTile)
   {
     for (i32 xthTile = 0; xthTile < TILES_PER_CHUNK_DIM; ++xthTile)
@@ -366,9 +376,21 @@ void World::drawPlayer()
 
 void World::draw()
 {
+  // Draw all the chunks in the render distance
+  Vec2i playerChunk = player->position.nthChunk;
+  for (int y = -m_renderDistance; y <= m_renderDistance; y++)
+  {
+    for (int x = -m_renderDistance; x <= m_renderDistance; x++)
+    {
+      Vec2i renderChunk = playerChunk + Vec2i(x, y);
+
+      if (renderChunk.x >= CHUNKS_DIM || renderChunk.y >= CHUNKS_DIM || renderChunk.x < 0 || renderChunk.y < 0)
+        continue;
+
+      drawChunk(renderChunk);
+    }
+  }
+
   drawGrid();
   drawPlayer();
-
-  Chunk *&chunky = getChunkAtWorldPos(player->pos);
-  drawChunk(chunky);
 }
