@@ -35,7 +35,6 @@ struct Player
   i32 squareSize = 24;
   size_t textureID; // TODO idk how itll shape out but needs a texture fs
 };
-};
 
 enum TileType
 {
