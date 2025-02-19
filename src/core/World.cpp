@@ -313,10 +313,10 @@ void World::drawGrid()
         continue;
 
       // Draw tiles inside chunk
-      drawGridTile(xthChunk, ythChunk);
+      drawGridTile(renderChunk.x, renderChunk.y);
       // Draw the chunk
-      m_game->camera->drawRect(Vec2f((m_chunkSize / 2) + xthChunk * m_chunkSize,
-                                     ((m_chunkSize / 2) + ythChunk * m_chunkSize)),
+      m_game->camera->drawRect(Vec2f((m_chunkSize / 2) + renderChunk.x * m_chunkSize,
+                                     ((m_chunkSize / 2) + renderChunk.y * m_chunkSize)),
                                m_chunkSize, m_chunkSize, {0, 255, 0, 255});
     }
   }
