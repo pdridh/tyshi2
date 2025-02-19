@@ -7,8 +7,8 @@
 #include <random>
 #include <algorithm>
 #include <cassert>
-
-static constexpr int CHUNKS_DIM = 4;
+#include <unordered_map>
+#include <string>
 static constexpr int TOTAL_CHUNKS = CHUNKS_DIM * CHUNKS_DIM;
 static constexpr int NUMBER_OF_BIOME_PTS = 5;
 static constexpr int TILES_PER_CHUNK_DIM = 4;
@@ -63,6 +63,8 @@ struct BiomePoint
   Biome biome;
 };
 
+static size_t nextTextureId = 1;
+
 class World
 {
 private:
@@ -82,13 +84,36 @@ private:
   BiomePoint biomePoints[NUMBER_OF_BIOME_PTS];
 
   Vec2f m_origin;
-
+  std::unordered_map<size_t, SDL_Texture *> textureMap;
   Player *player;
 
 private:
 public:
   World(Engine *game);
   ~World();
+
+  // TODO move these into some kind of resource loading thing idk
+  size_t loadTexture(const char *file)
+  {
+    SDL_Texture *texture = IMG_LoadTexture(m_game->m_renderer, file);
+    if (!texture)
+    {
+      SDL_Log("Failed to load texture: %s, Error: %s\n", file, SDL_GetError());
+      return -1;
+    }
+
+    size_t id = nextTextureId++;
+    textureMap[id] = texture;
+    return id;
+  }
+
+  SDL_Texture *getTextureById(size_t id)
+  {
+    auto it = textureMap.find(id);
+    assert(it != textureMap.end());
+
+    return it->second;
+  }
 
   // ***************************** Generation related stuff ****************** //
 

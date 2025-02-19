@@ -21,7 +21,7 @@ World::World(Engine *game)
   player->position = absChunkToWorld(Vec2i(0, 0));
 
   player->speed = 500;
-  player->textureID = 1;
+  player->textureID = loadTexture("assets/char_walk.png");
 }
 
 World::~World()
