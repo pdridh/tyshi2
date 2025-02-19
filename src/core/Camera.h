@@ -27,17 +27,17 @@ public:
 
   //****** CAMERA STUFF */
   void setCameraSize(f32 width, f32 height);
-  void centerOn(Vec2f centerPos);
+  void centerOn(Vec2f actualPosition);
   void setZoom(f32 zoom);
   void zoomBy(f32 scale);
 
   //************** CONVERSIONS */
-  Vec2f screenToWorld(Vec2f screenPos);
-  Vec2f worldToScreen(Vec2f worldPos);
+  Vec2f screenToActual(Vec2f screenPosition);
+  Vec2f actualToScreen(Vec2f actualPosition);
 
   //*********** DRAWING STUFF */
-  void drawRect(Vec2f worldPos, f32 width, f32 height, Color color, bool filled = false);
-  void drawRect(f32 worldX, f32 worldY, f32 width, f32 height, Color color, bool filled = false);
-  void drawTexture(SDL_Texture *texture, SDL_FRect &srcRect, Vec2f worldPos, f32 width, f32 height, bool trans);
-  void drawPoint(f32 x, f32 y, Color c);
+  void drawRect(Vec2f actualPosition, f32 width, f32 height, Color color, bool filled = false);
+  void drawRect(f32 actualX, f32 actualY, f32 width, f32 height, Color color, bool filled = false);
+  void drawTexture(Vec2f actualPosition, SDL_Texture *texture, SDL_FRect &srcRect, f32 width, f32 height, bool trans);
+  void drawPoint(f32 actualX, f32 actualY, Color c);
 };

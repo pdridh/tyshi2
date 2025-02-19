@@ -21,12 +21,20 @@ struct Tile
   i32 atlasCode;
 };
 
+struct WorldPosition
+{
+  Vec2i nthChunk;
+  Vec2i nthTile;
+  Vec2f actualPosition;
+};
+
 struct Player
 {
-  Vec2f pos;
+  WorldPosition position;
   f32 speed;
   i32 squareSize = 24;
-  i32 textureID; // TODO idk how itll shape out but needs a texture fs
+  size_t textureID; // TODO idk how itll shape out but needs a texture fs
+};
 };
 
 enum TileType
@@ -52,7 +60,7 @@ struct Chunk
 
 struct BiomePoint
 {
-  Vec2i pos;
+  Vec2i position;
   Biome biome;
 };
 
@@ -86,35 +94,48 @@ public:
 
   BiomePoint randomSample();
   void generateChunkTiles(Chunk *chunky);
-  Chunk *createChunk(Vec2i pos);
+  Chunk *createChunk(Vec2i position);
   void generateWorld();
   void printWorld();
 
   // **************************** Coordinate conversions *******************//
 
-  // Convert from world position to a chunk (x,y)
+  // Convert from actual position to a chunk (x,y)
   // not relative to anything
-  Vec2i worldToAbsChunk(Vec2f worldPos);
+  Vec2i actualToAbsChunk(Vec2f actualPosition);
 
-  // Convert from a chunk(x,y) to world position
-  Vec2f absChunkToWorld(Vec2i nthChunk);
+  // Convert from a chunk(x,y) to actual position
+  // The actual position is just the start of the chunk (bottom left)
+  Vec2f absChunkToActual(Vec2i nthChunk);
 
-  // Convert from world position to a tile not bounded by any chunk
+  // Convert from acutal position to a tile not bounded by any chunk
   // THIS can range above the tile per chunk value
-  Vec2i worldToAbsTile(Vec2f worldPos);
+  Vec2i actualToAbsTile(Vec2f actualPosition);
 
-  // Convert from world position to a tile INSIDE a chunk
-  // this coordinate can only range from 0,0 to the tile per chunk value
-  Vec2i worldToChunkTile(Vec2f worldPos);
+  // Convert from actual position to a tile INSIDE a chunk
+  // the returned coordinate can only range from 0,0 to the tile per chunk value
+  Vec2i actualToChunkTile(Vec2f actualPosition);
 
-  // Convert absolute tile, i.e, a tile unbounded by any chunk to world position
-  Vec2f absTileToWorld(Vec2i absTile);
+  // Convert absolute tile, i.e, a tile unbounded by any chunk to actual position
+  // The actual position returned is centered at the middle of the tile
+  Vec2f absTileToActual(Vec2i absTile);
 
-  // Convert a chunk(x,y)'s tile(xt, yt) to a world position
-  Vec2f chunkTileToWorld(Vec2i nthChunk, Vec2i nthTile);
+  // Convert a chunk(x,y)'s tile(xt, yt) to an actual position
+  // The actual position is returned at the center of the tile
+  Vec2f chunkTileToActual(Vec2i nthChunk, Vec2i nthTile);
 
-  void setChunkTile(Vec2f worldPos, i32 atlasCode);
-  void setChunkTile(i32 xthChunk, i32 ythChunk, i32 xthTile, i32 ythTile, i32 atlasCode);
+  // Get the WorldPosition (chunk, tile and actual) from an actual position
+  // Calls actualToAbsChunk() and actualToChunkTile() internally
+  WorldPosition actualToWorld(Vec2f actualPosition);
+
+  // Get the WorldPosition from an absolute chunk position
+  // The position is set at the bottom left of the chunk
+  WorldPosition absChunkToWorld(Vec2i nthChunk);
+
+  // Get the WorldPosition from an absolute chunk position and the tile inside that chunk
+  WorldPosition chunkTileToWorld(Vec2i nthChunk, Vec2i nthTile);
+
+  // **************************** Data retrieving stuff *******************//
 
   // Get the reference to the ptr in chunks[]
   // by the absolute (x,y) of a chunk
@@ -123,31 +144,30 @@ public:
   Chunk *&getChunk(Vec2i nthChunk);
 
   // Get reference to the ptr in chunks[] directly by
-  // a worldPos, converts the worldPos to an absolute chunk
+  // a actualPosition, converts the actualPosition to an absolute chunk
   // and calls getChunk() internally (meaning this can create a chunk too)
-  Chunk *&getChunkAtWorldPos(Vec2f worldPos);
+  Chunk *&getChunkAtActual(Vec2f actualPos);
 
-  Tile *getTileFromChunk(Chunk *c, Vec2i tilePos)
-  {
+  // Just a handy wrapper that retrieves the tile from a chunk's
+  // 1D array
+  Tile *getTileFromChunk(Chunk *c, Vec2i nthTile);
 
-    assert(tilePos.x >= 0 &&
-           tilePos.y >= 0 &&
-           tilePos.x < TILES_PER_CHUNK_DIM &&
-           tilePos.y < TILES_PER_CHUNK_DIM);
+  // **************************** Updating  stuff *******************//
 
-    return c->tiles[tilePos.y * TILES_PER_CHUNK_DIM + tilePos.x];
-  }
+  void updatePlayer();
+  void update();
+
+  // **************************** Drawing stuff *******************//
 
   void drawGridTile(i32 xthChunk, i32 ythChunk);
   void drawGrid();
 
+  // Draw chunk based on its chunk position
+  void drawChunk(Vec2i nthChunk);
+
+  // Draw a chunk given its ptr
   void drawChunk(Chunk *chunk);
   void drawTile(Tile *tile);
-
-  // Player stuff
-  void updatePlayer();
   void drawPlayer();
-
-  void update();
   void draw();
 };

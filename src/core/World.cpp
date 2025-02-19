@@ -17,9 +17,9 @@ World::World(Engine *game)
   generateWorld();
 
   player = new Player();
-  player->pos = Vec2f(0, 0);
+  player->position = absChunkToWorld(Vec2i(0, 0));
 
-  player->speed = 200;
+  player->speed = 500;
   player->textureID = 1;
 }
 
@@ -79,7 +79,7 @@ void World::generateChunkTiles(Chunk *chunky)
   }
 }
 
-Chunk *World::createChunk(Vec2i pos)
+Chunk *World::createChunk(Vec2i position)
 {
 
   Biome closestBiome = Biome::Grassland;                   // defualt
@@ -88,7 +88,7 @@ Chunk *World::createChunk(Vec2i pos)
   // Find closest biome point
   for (const auto &point : biomePoints)
   {
-    f32 distSqred = point.pos.distanceToSquared(pos);
+    f32 distSqred = point.position.distanceToSquared(position);
     if (distSqred < minDistSqred)
     {
       minDistSqred = distSqred;
@@ -97,12 +97,13 @@ Chunk *World::createChunk(Vec2i pos)
   }
 
   // TODO change allocation from new to maybe placement new or stackallocator type shit
-  Chunk *c = new Chunk();
-  c->biome = closestBiome;
-  c->position = pos;
-  generateChunkTiles(c);
+  Chunk *chunky = new Chunk();
+  chunky->biome = closestBiome;
+  chunky->position = position;
+  generateChunkTiles(chunky);
 
-  return c;
+
+  return chunky;
 }
 
 void World::generateWorld()
@@ -118,87 +119,164 @@ void World::generateWorld()
 
 void World::printWorld()
 {
-  for (i32 y = 0; y < CHUNKS_DIM; ++y)
+  // TODO also some way to store and retrieve THE WORLD SEEDD
+  // Prints the biome points with their psoitions
+  for (auto &point : biomePoints)
   {
-    for (i32 x = 0; x < CHUNKS_DIM; ++x)
+    point.position.print("Biome pt");
+
+    switch (point.biome)
     {
-      Chunk *&chunk = chunks[y * CHUNKS_DIM + x];
-      if (chunk == nullptr)
-      {
-        continue;
-      }
-
-      printf("trying to draw chunk?\n");
-
-      char c;
-      switch (chunk->biome)
-      {
-      case Biome::Grassland:
-        c = 'G';
-        break;
-      case Biome::Forest:
-        c = 'F';
-        break;
-      case Biome::Rocky:
-        c = 'R';
-        break;
-      }
-
-      for (i32 i = 0; i < NUMBER_OF_BIOME_PTS; ++i)
-      {
-        if (biomePoints[i].pos == Vec2i(x, y))
-        {
-          printf("C");
-          break;
-        }
-      }
-
-      printf("%c\t", c);
+    case Grassland:
+      printf("Grass\n");
+      break;
+    case Forest:
+      printf("Forest\n");
+      break;
+    case Rocky:
+      printf("Rocky\n");
+      break;
     }
-    // printf("\n");
   }
 }
 
-Vec2i World::worldToAbsChunk(Vec2f worldPos)
+Vec2i World::actualToAbsChunk(Vec2f actualPosition)
 {
-  Vec2i nthChunk = worldPos.scaleDown(m_chunkSize);
-
+  Vec2i nthChunk = actualPosition.scaleDown(m_chunkSize);
   return nthChunk;
 }
 
-Vec2f World::absChunkToWorld(Vec2i nthChunk)
+Vec2f World::absChunkToActual(Vec2i nthChunk)
 {
-  Vec2f chunkPos = nthChunk.scale(m_chunkSize);
-  return chunkPos;
+  Vec2f actualPosition = nthChunk.scale(m_chunkSize);
+  return actualPosition;
 }
 
-Vec2i World::worldToAbsTile(Vec2f worldPos)
+Vec2i World::actualToAbsTile(Vec2f actualPosition)
 {
-  Vec2i nthTile = worldPos.scaleDown(m_tileSize);
+  Vec2i nthTile = actualPosition.scaleDown(m_tileSize);
   return nthTile;
 }
 
-Vec2i World::worldToChunkTile(Vec2f worldPos)
+Vec2i World::actualToChunkTile(Vec2f actualPosition)
 {
-  Vec2i absTile = worldToAbsTile(worldPos);
+  Vec2i absTile = actualToAbsTile(actualPosition);
   Vec2i nthTile = Vec2i(absTile.x % TILES_PER_CHUNK_DIM, absTile.y % TILES_PER_CHUNK_DIM);
 
   return nthTile;
 }
 
-Vec2f World::absTileToWorld(Vec2i absTile)
+Vec2f World::absTileToActual(Vec2i nthTile)
 {
-  Vec2f worldPos = absTile.scale(m_tileSize) + Vec2f(m_tileSize / 2, m_tileSize / 2);
-  return worldPos;
+  // Centered
+  Vec2f actualPosition = nthTile.scale(m_tileSize) + Vec2f(m_tileSize / 2, m_tileSize / 2);
+  return actualPosition;
 }
 
-Vec2f World::chunkTileToWorld(Vec2i nthChunk, Vec2i nthTile)
+Vec2f World::chunkTileToActual(Vec2i nthChunk, Vec2i nthTile)
 {
-  Vec2i chunkPos = nthChunk.scale(m_chunkSize);
+  Vec2f chunkPosition = nthChunk.scale(m_chunkSize);
   Vec2i tileCenter = nthTile.scale(m_tileSize) + Vec2i(m_tileSize / 2, m_tileSize / 2);
-  Vec2f worldPos = chunkPos + tileCenter;
+  Vec2f actualPosition = chunkPosition + tileCenter;
 
-  return worldPos;
+  return actualPosition;
+}
+
+WorldPosition World::actualToWorld(Vec2f actualPosition)
+{
+  Vec2i nthChunk = actualToAbsChunk(actualPosition);
+  Vec2i nthTile = actualToChunkTile(actualPosition);
+
+  return WorldPosition{nthChunk, nthTile, actualPosition};
+}
+
+WorldPosition World::absChunkToWorld(Vec2i nthChunk)
+{
+  Vec2i nthTile = Vec2i(0, 0);
+  Vec2f actualPosition = absChunkToActual(nthChunk);
+
+  return WorldPosition{nthChunk, nthTile, actualPosition};
+}
+
+WorldPosition World::chunkTileToWorld(Vec2i nthChunk, Vec2i nthTile)
+{
+  Vec2f actualPosition = chunkTileToActual(nthChunk, nthTile);
+
+  return WorldPosition{nthChunk, nthTile, actualPosition};
+}
+
+Chunk *&World::getChunk(Vec2i position)
+{
+  assert(position.x >= 0 && position.y >= 0 && position.x < CHUNKS_DIM && position.y < CHUNKS_DIM);
+  Chunk *&c = chunks[position.y * CHUNKS_DIM + position.x];
+
+  // The chunk requested exists
+  if (c != nullptr)
+  {
+    return c;
+  }
+
+  // IF the chunk DOES NOT exist then we have to create it
+  c = createChunk(position);
+  return c;
+}
+
+Chunk *&World::getChunkAtActual(Vec2f actualPosition)
+{
+  Vec2i nthChunk = actualToAbsChunk(actualPosition);
+  return getChunk(nthChunk);
+}
+
+Tile *World::getTileFromChunk(Chunk *c, Vec2i nthTile)
+{
+  assert(nthTile.x >= 0 &&
+         nthTile.y >= 0 &&
+         nthTile.x < TILES_PER_CHUNK_DIM &&
+         nthTile.y < TILES_PER_CHUNK_DIM);
+
+  return c->tiles[nthTile.y * TILES_PER_CHUNK_DIM + nthTile.x];
+}
+
+void World::updatePlayer()
+{
+  Vec2f dir = Vec2f::ZERO();
+  Input &input = m_game->input;
+
+  Vec2f oldPosition = player->position.actualPosition;
+
+  if (input.isKeyPressed(SDL_SCANCODE_W))
+  {
+    dir += Vec2f(0, 1);
+  }
+  else if (input.isKeyPressed(SDL_SCANCODE_S))
+  {
+    dir += Vec2f(0, -1);
+  }
+
+  if (input.isKeyPressed(SDL_SCANCODE_A))
+  {
+    dir += Vec2f(-1, 0);
+  }
+  else if (input.isKeyPressed(SDL_SCANCODE_D))
+  {
+    dir += Vec2f(1, 0);
+  }
+  Vec2f move = dir.normalize().scale(player->speed).scale(m_game->dt);
+  Vec2f newPosition = oldPosition + move;
+
+  // TODO restrain player somehow idk
+  if (newPosition.x < 0)
+  {
+    newPosition.x = 0;
+  }
+
+  player->position = actualToWorld(newPosition);
+  m_game->camera->centerOn(player->position.actualPosition);
+}
+
+void World::update()
+{
+  updatePlayer();
 }
 
 void World::drawGridTile(i32 xthChunk, i32 ythChunk)
@@ -207,10 +285,10 @@ void World::drawGridTile(i32 xthChunk, i32 ythChunk)
   {
     for (i32 xthTile = 0; xthTile < TILES_PER_CHUNK_DIM; ++xthTile)
     {
-      Vec2f tilePos = chunkTileToWorld(Vec2i(xthChunk, ythChunk), Vec2i(xthTile, ythTile));
+      Vec2f tilePosition = chunkTileToActual(Vec2i(xthChunk, ythChunk), Vec2i(xthTile, ythTile));
 
-      m_game->camera->drawPoint(tilePos.x, tilePos.y, {80, 80, 80, 255});
-      m_game->camera->drawRect(tilePos, m_tileSize, m_tileSize, {80, 80, 80, 255});
+      m_game->camera->drawPoint(tilePosition.x, tilePosition.y, {80, 80, 80, 255});
+      m_game->camera->drawRect(tilePosition, m_tileSize, m_tileSize, {80, 80, 80, 255});
     }
   }
 }
@@ -236,6 +314,12 @@ void World::drawGrid()
   m_game->camera->drawRect(m_origin + Vec2f(m_chunkSize * CHUNKS_DIM / 2, m_chunkSize * CHUNKS_DIM / 2), m_chunkSize * CHUNKS_DIM, m_chunkSize * CHUNKS_DIM, {255, 0, 0, 255});
 }
 
+void World::drawChunk(Vec2i nthChunk)
+{
+  Chunk *&chunky = getChunk(nthChunk);
+  drawChunk(chunky);
+}
+
 void World::drawChunk(Chunk *chunk)
 {
   int x = 0;
@@ -246,7 +330,21 @@ void World::drawChunk(Chunk *chunk)
       Tile *tile = getTileFromChunk(chunk, Vec2i(xthTile, ythTile));
       if (tile)
       {
-        drawTile(tile);
+        Vec2f tilePosition = chunkTileToActual(tile->nthChunk, tile->position);
+        Color biomeColor;
+        switch (chunk->biome)
+        {
+        case Biome::Grassland:
+          biomeColor = {0, 255, 0, 255};
+          break;
+        case Biome::Forest:
+          biomeColor = {0, 128, 12, 255};
+          break;
+        case Biome::Rocky:
+          biomeColor = {123, 63, 0, 255};
+          break;
+        }
+        m_game->camera->drawRect(tilePosition, m_tileSize, m_tileSize, biomeColor, true);
       }
     }
   }
@@ -254,103 +352,16 @@ void World::drawChunk(Chunk *chunk)
 
 void World::drawTile(Tile *tile)
 {
-  Vec2f tilePosInWorld = chunkTileToWorld(tile->nthChunk, tile->position);
-  m_game->camera->drawRect(tilePosInWorld, m_tileSize - 50, m_tileSize - 50, {255, 0, 0, 255}, false);
-}
-
-void World::setChunkTile(Vec2f worldPos, i32 atlasCode)
-{
-  Vec2i nthChunk = worldToAbsChunk(worldPos);
-  Vec2i nthTile = worldToChunkTile(worldPos);
-
-  setChunkTile(nthChunk.x, nthChunk.y, nthTile.x, nthTile.y, atlasCode);
-}
-
-void World::setChunkTile(i32 xthChunk, i32 ythChunk, i32 xthTile, i32 ythTile, i32 atlasCode)
-{
-  // auto &chunk = chunks[ythChunk * m_nChunks + xthChunk];
-  // if (chunk == nullptr)
-  // {
-  //   chunk = std::make_unique<Chunk>(m_nTiles);
-  //   chunk->tiles[ythTile * m_nTiles + xthTile] = std::make_unique<Tile>(atlasCode);
-  //   return;
-  // }
-
-  // auto &tile = chunk->tiles[ythTile * m_nTiles + xthTile];
-
-  // // Check if tile is created
-  // if (tile == nullptr)
-  // {
-  //   tile = std::make_unique<Tile>(atlasCode);
-  //   return;
-  // }
-
-  // tile->atlasCode = atlasCode;
-}
-
-Chunk *&World::getChunk(Vec2i pos)
-{
-  // TODO Assert that this position is valid
-  Chunk *&c = chunks[pos.y * CHUNKS_DIM + pos.x];
-
-  // The chunk requested exists
-  if (c != nullptr)
-  {
-    return c;
-  }
-
-  // IF the chunk DOES NOT exist then we have to create it
-  c = createChunk(pos);
-
-  return c;
-}
-
-Chunk *&World::getChunkAtWorldPos(Vec2f worldPos)
-{
-  Vec2i nthChunk = worldToAbsChunk(worldPos);
-  return getChunk(nthChunk);
-}
-
-void World::updatePlayer()
-{
-  Vec2f dir = Vec2f::ZERO();
-  Input &input = m_game->input;
-
-  if (input.isKeyPressed(SDL_SCANCODE_W))
-  {
-    dir += Vec2f(0, 1);
-  }
-  else if (input.isKeyPressed(SDL_SCANCODE_S))
-  {
-    dir += Vec2f(0, -1);
-  }
-
-  if (input.isKeyPressed(SDL_SCANCODE_A))
-  {
-    dir += Vec2f(-1, 0);
-  }
-  else if (input.isKeyPressed(SDL_SCANCODE_D))
-  {
-    dir += Vec2f(1, 0);
-  }
-  Vec2f move = dir.normalize().scale(player->speed).scale(m_game->dt);
-  player->pos += move;
-
-  m_game->camera->centerOn(player->pos);
+  Vec2f tilePosition = chunkTileToActual(tile->nthChunk, tile->position);
+  SDL_FRect srcRect = {4 * 16, 8 * 16, 16, 16};
 }
 
 void World::drawPlayer()
 {
 
-  m_game->camera->drawRect(player->pos,
-                           player->squareSize, player->squareSize, {255, 0, 0, 255});
-  m_game->camera->drawRect(player->pos,
-                           player->squareSize / 4, player->squareSize / 4, {0, 0, 255, 255});
-}
-
-void World::update()
-{
-  updatePlayer();
+  SDL_FRect src = {0, 0, 32, 32};
+  m_game->camera->drawTexture(player->position.actualPosition, getTextureById(player->textureID), src,
+                              player->squareSize * 4, player->squareSize * 4, true);
 }
 
 void World::draw()
