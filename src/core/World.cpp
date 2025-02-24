@@ -1,13 +1,13 @@
 #include "World.h"
 
 World::World(Engine *game)
-    : m_game{game}, gen{555555}
+    : m_game{game}, gen{2135}
 {
   m_chunkSize = 256;
 
   m_worldSize = CHUNKS_DIM * m_chunkSize;
   m_tileSize = m_chunkSize / TILES_PER_CHUNK_DIM;
-  m_renderDistance = 3;
+  m_renderDistance = 1;
 
   biomeX = std::uniform_int_distribution<>(0, CHUNKS_DIM - 1);
   biomeY = std::uniform_int_distribution<>(0, CHUNKS_DIM - 1);
@@ -102,7 +102,6 @@ Chunk *World::createChunk(Vec2i position)
   chunky->biome = closestBiome;
   chunky->position = position;
   generateChunkTiles(chunky);
-
 
   return chunky;
 }
@@ -317,7 +316,7 @@ void World::drawGrid()
       // Draw the chunk
       m_game->camera->drawRect(Vec2f((m_chunkSize / 2) + renderChunk.x * m_chunkSize,
                                      ((m_chunkSize / 2) + renderChunk.y * m_chunkSize)),
-                               m_chunkSize, m_chunkSize, {0, 255, 0, 255});
+                               m_chunkSize, m_chunkSize, {0, 0, 255, 255});
     }
   }
 

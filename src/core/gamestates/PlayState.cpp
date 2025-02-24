@@ -36,6 +36,16 @@ void PlayState::update(Engine *game)
     game->changeState(MenuState::instance());
   }
 
+  i32 scroll = game->input.mouseScroll();
+  if (scroll < 0)
+  {
+    game->camera->zoomBy(0.75);
+  }
+  else if (scroll > 0)
+  {
+    game->camera->zoomBy(1.25);
+  }
+
   if (world)
   {
     world->update();
