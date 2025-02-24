@@ -1,6 +1,6 @@
 #include "Engine.h"
-#include "states/PlayState.h"
-#include "states/MenuState.h"
+#include "gamestates/PlayState.h"
+#include "gamestates/MenuState.h"
 
 const SDL_Color Engine::RENDER_CLEAR_COLOR = {0, 0, 0, 255}; // Black clear color
 
