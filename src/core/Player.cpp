@@ -1,9 +1,11 @@
 #include "Player.h"
 #include "World.h"
 
-Player::Player(World &world, WorldPosition _position, size_t textureID)
-    : m_world{world}, position{_position}, m_textureID{textureID}
+Player::Player(World &_world, WorldPosition _position, size_t textureID)
+    : world{_world}, position{_position}, m_textureID{textureID}
 {
+  // TODO make these tweaks easier (also mvoement is not done yet)
+  movementSpeed = 200;
   m_stateMachine = new EntityStateMachine<Player>(*this);
   m_stateMachine->changeState(PlayerIdle::instance());
 }
@@ -22,7 +24,7 @@ void Player::draw()
 {
   SDL_FRect src = {0, 0, 32, 32};
 
-  Engine &engine = m_world.m_engine;
+  Engine &engine = world.m_engine;
   engine.camera->drawTexture(position.actualPosition,
                              engine.resourceManager->getTextureById(m_textureID),
                              src,

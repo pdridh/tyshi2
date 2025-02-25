@@ -10,18 +10,16 @@ class World;
 class Player
 {
 private:
-  World &m_world;
-
-  f32 m_maxMovementSpeed;
-
   EntityStateMachine<Player> *m_stateMachine;
 
   // TODO Looks like the drawing stuff are related so maybe a Sprite struct?
   i32 m_drawSize = 24;
   size_t m_textureID; // TODO idk how itll shape out but needs a texture fs
 public:
+  World &world;
   WorldPosition position;
   Vec2f velocity;
+  f32 movementSpeed;
 
 public:
   Player(World &world, WorldPosition pos, size_t textureID);
