@@ -70,6 +70,7 @@ bool Engine::init(const std::string &title)
   m_memory.persistentStorage = allocateMemory(m_memory.persistentStorageSize);
   m_memory.transientStorage = allocateMemory(m_memory.transientStorageSize);
 
+  resourceManager = new ResourceManager(*this);
   camera = new Camera(m_renderer, m_screenWidth, m_screenHeight);
 
   changeState(MenuState::instance());
@@ -139,13 +140,13 @@ void Engine::changeState(GameState *state)
   // Remove it from the states stack
   if (!m_states.empty())
   {
-    m_states.back()->onExit();
+    m_states.back()->onExit(*this);
     m_states.pop_back();
   }
 
   // Change to another state completely
   m_states.push_back(state);
-  m_states.back()->onEnter(this);
+  m_states.back()->onEnter(*this);
 }
 
 void Engine::addState(GameState *state)
@@ -153,12 +154,12 @@ void Engine::addState(GameState *state)
   // pause current state
   if (!m_states.empty())
   {
-    m_states.back()->pause();
+    m_states.back()->pause(*this);
   }
 
   // Add a new state above this state
   m_states.push_back(state);
-  m_states.back()->onEnter(this);
+  m_states.back()->onEnter(*this);
 }
 
 void Engine::exitState()
@@ -166,14 +167,14 @@ void Engine::exitState()
   // Pop current state
   if (!m_states.empty())
   {
-    m_states.back()->onExit();
+    m_states.back()->onExit(*this);
     m_states.pop_back();
   }
 
   // resume previous state
   if (!m_states.empty())
   {
-    m_states.back()->resume();
+    m_states.back()->resume(*this);
   }
 }
 
@@ -186,12 +187,12 @@ void Engine::quit()
 void Engine::update()
 {
   // Update top of the stack
-  m_states.back()->update(this);
+  m_states.back()->update(*this);
 }
 
 void Engine::renderGame()
 {
-  m_states.back()->draw(this);
+  m_states.back()->draw(*this);
 }
 
 void Engine::render()
@@ -207,7 +208,6 @@ void Engine::render()
 
 void Engine::clean()
 {
-
   // free stuff
   if (m_memory.persistentStorage != nullptr)
   {
@@ -217,6 +217,11 @@ void Engine::clean()
   if (m_memory.transientStorage != nullptr)
   {
     freeAllocatedMemory(m_memory.transientStorage, m_memory.transientStorageSize);
+  }
+
+  if (resourceManager != nullptr)
+  {
+    delete resourceManager;
   }
 
   TTF_Quit();

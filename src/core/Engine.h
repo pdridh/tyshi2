@@ -8,6 +8,7 @@
 
 #include "Input.h"
 #include "Camera.h"
+#include "ResourceManager.h"
 
 class GameState;
 
@@ -56,6 +57,7 @@ public:
   GameMemory m_memory;
   Input input;
   Camera *camera;
+  ResourceManager *resourceManager;
 
   // State related stuff
   void changeState(GameState *state);
