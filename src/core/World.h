@@ -4,6 +4,7 @@
 
 #include "Engine.h"
 #include "../utils/WorldPosition.h"
+#include "Player.h"
 
 #include <random>
 #include <algorithm>
@@ -72,6 +73,7 @@ public:
   BiomePoint biomePoints[NUMBER_OF_BIOME_PTS];
 
   Vec2f m_origin;
+  Player *player;
 
 private:
 public:

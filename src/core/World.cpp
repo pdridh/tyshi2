@@ -15,6 +15,9 @@ World::World(Engine &engine)
 
   m_origin = Vec2f::ZERO();
 
+  player = new Player(*this, chunkTileToWorld(Vec2i(0, 2), Vec2i(0, 0)),
+                      m_engine.resourceManager->loadTexture("assets/char_walk.png"));
+
   generateWorld();
 }
 
@@ -230,6 +233,7 @@ Tile *World::getTileFromChunk(Chunk *c, Vec2i nthTile)
 
 void World::update()
 {
+  player->update();
 }
 
 void World::drawGridTile(i32 xthChunk, i32 ythChunk)
@@ -249,7 +253,7 @@ void World::drawGridTile(i32 xthChunk, i32 ythChunk)
 void World::drawGrid()
 {
 
-  Vec2i playerChunk = Vec2i::ZERO();
+  Vec2i playerChunk = player->position.nthChunk;
 
   // For each chunk
   for (i32 ythChunk = -m_renderDistance; ythChunk <= m_renderDistance; ++ythChunk)
@@ -321,7 +325,7 @@ void World::drawTile(Tile *tile)
 void World::draw()
 {
   // Draw all the chunks in the render distance
-  Vec2i playerChunk = Vec2i::ZERO();
+  Vec2i playerChunk = player->position.nthChunk;
   for (int y = -m_renderDistance; y <= m_renderDistance; y++)
   {
     for (int x = -m_renderDistance; x <= m_renderDistance; x++)
@@ -336,4 +340,5 @@ void World::draw()
   }
 
   drawGrid();
+  player->draw();
 }
