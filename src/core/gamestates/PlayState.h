@@ -13,12 +13,12 @@ private:
 public:
   static PlayState *instance();
 
-  void onEnter(Engine *game) override;
-  void onExit() override;
+  void onEnter(Engine &engine) override;
+  void onExit(Engine &engine) override;
 
-  void pause() override;
-  void resume() override;
+  void pause(Engine &engine) override;
+  void resume(Engine &engine) override;
 
-  void update(Engine *game) override;
-  void draw(Engine *game) override;
+  void update(Engine &engine) override;
+  void draw(Engine &engine) override;
 };

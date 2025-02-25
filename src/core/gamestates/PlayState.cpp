@@ -8,42 +8,42 @@ PlayState *PlayState::instance()
   return &m_self;
 }
 
-void PlayState::onEnter(Engine *game)
+void PlayState::onEnter(Engine &engine)
 {
   printf("Entering play...\n");
-  world = new World(game);
+  world = new World(engine);
 }
 
-void PlayState::onExit()
+void PlayState::onExit(Engine &engine)
 {
   printf("Exiting play...\n");
   delete world;
   world = nullptr;
 }
 
-void PlayState::pause()
+void PlayState::pause(Engine &engine)
 {
 }
 
-void PlayState::resume()
+void PlayState::resume(Engine &engine)
 {
 }
 
-void PlayState::update(Engine *game)
+void PlayState::update(Engine &engine)
 {
-  if (game->input.isKeyDownFrame(SDL_SCANCODE_ESCAPE))
+  if (engine.input.isKeyDownFrame(SDL_SCANCODE_ESCAPE))
   {
-    game->changeState(MenuState::instance());
+    engine.changeState(MenuState::instance());
   }
 
-  i32 scroll = game->input.mouseScroll();
+  i32 scroll = engine.input.mouseScroll();
   if (scroll < 0)
   {
-    game->camera->zoomBy(0.75);
+    engine.camera->zoomBy(0.75);
   }
   else if (scroll > 0)
   {
-    game->camera->zoomBy(1.25);
+    engine.camera->zoomBy(1.25);
   }
 
   if (world)
@@ -52,7 +52,7 @@ void PlayState::update(Engine *game)
   }
 }
 
-void PlayState::draw(Engine *game)
+void PlayState::draw(Engine &engine)
 {
   if (world)
   {

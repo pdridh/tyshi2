@@ -8,36 +8,36 @@ MenuState *MenuState::instance()
   return &m_self;
 }
 
-void MenuState::onEnter(Engine *game)
+void MenuState::onEnter(Engine &engine)
 {
   printf("Entering menu...\n");
 }
 
-void MenuState::onExit()
+void MenuState::onExit(Engine &engine)
 {
   printf("Exiting menu...\n");
 }
 
-void MenuState::pause()
+void MenuState::pause(Engine &engine)
 {
 }
 
-void MenuState::resume()
+void MenuState::resume(Engine &engine)
 {
 }
 
-void MenuState::update(Engine *game)
+void MenuState::update(Engine &engine)
 {
-  if (game->input.isKeyDownFrame(SDL_SCANCODE_ESCAPE))
+  if (engine.input.isKeyDownFrame(SDL_SCANCODE_ESCAPE))
   {
-    game->quit();
+    engine.quit();
   }
-  else if (game->input.isKeyDownFrame(SDL_SCANCODE_SPACE))
+  else if (engine.input.isKeyDownFrame(SDL_SCANCODE_SPACE))
   {
-    game->changeState(PlayState::instance());
+    engine.changeState(PlayState::instance());
   }
 }
 
-void MenuState::draw(Engine *game)
+void MenuState::draw(Engine &engine)
 {
 }

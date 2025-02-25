@@ -9,18 +9,19 @@ protected:
   GameState() {}
 
 public:
-  virtual void onEnter(Engine *game) = 0;
-  virtual void onExit() = 0;
+  virtual ~GameState() {}
+  virtual void onEnter(Engine &engine) = 0;
+  virtual void onExit(Engine &engine) = 0;
 
-  virtual void pause() = 0;
-  virtual void resume() = 0;
+  virtual void pause(Engine &engine) = 0;
+  virtual void resume(Engine &engine) = 0;
 
-  virtual void update(Engine *game) = 0;
-  virtual void draw(Engine *game) = 0;
+  virtual void update(Engine &engine) = 0;
+  virtual void draw(Engine &engine) = 0;
 
-  void changeState(Engine *game,
+  void changeState(Engine &engine,
                    GameState *state)
   {
-    game->changeState(state);
+    engine.changeState(state);
   }
 };
