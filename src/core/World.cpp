@@ -1,7 +1,7 @@
 #include "World.h"
 
-World::World(Engine *game)
-    : m_game{game}, gen{2135}
+World::World(Engine &engine)
+    : m_engine{engine}, gen{2135}
 {
   m_chunkSize = 256;
 
@@ -16,12 +16,6 @@ World::World(Engine *game)
   m_origin = Vec2f::ZERO();
 
   generateWorld();
-
-  player = new Player();
-  player->position = absChunkToWorld(Vec2i(0, 0));
-
-  player->speed = 500;
-  player->textureID = loadTexture("assets/char_walk.png");
 }
 
 World::~World()
@@ -48,9 +42,6 @@ World::~World()
     delete c;
     c = nullptr;
   }
-
-  delete player;
-  player = nullptr;
 }
 
 BiomePoint World::randomSample()
@@ -237,46 +228,8 @@ Tile *World::getTileFromChunk(Chunk *c, Vec2i nthTile)
   return c->tiles[nthTile.y * TILES_PER_CHUNK_DIM + nthTile.x];
 }
 
-void World::updatePlayer()
-{
-  Vec2f dir = Vec2f::ZERO();
-  Input &input = m_game->input;
-
-  Vec2f oldPosition = player->position.actualPosition;
-
-  if (input.isKeyPressed(SDL_SCANCODE_W))
-  {
-    dir += Vec2f(0, 1);
-  }
-  else if (input.isKeyPressed(SDL_SCANCODE_S))
-  {
-    dir += Vec2f(0, -1);
-  }
-
-  if (input.isKeyPressed(SDL_SCANCODE_A))
-  {
-    dir += Vec2f(-1, 0);
-  }
-  else if (input.isKeyPressed(SDL_SCANCODE_D))
-  {
-    dir += Vec2f(1, 0);
-  }
-  Vec2f move = dir.normalize().scale(player->speed).scale(m_game->dt);
-  Vec2f newPosition = oldPosition + move;
-
-  // TODO restrain player somehow idk
-  if (newPosition.x < 0)
-  {
-    newPosition.x = 0;
-  }
-
-  player->position = actualToWorld(newPosition);
-  m_game->camera->centerOn(player->position.actualPosition);
-}
-
 void World::update()
 {
-  updatePlayer();
 }
 
 void World::drawGridTile(i32 xthChunk, i32 ythChunk)
@@ -287,8 +240,8 @@ void World::drawGridTile(i32 xthChunk, i32 ythChunk)
     {
       Vec2f tilePosition = chunkTileToActual(Vec2i(xthChunk, ythChunk), Vec2i(xthTile, ythTile));
 
-      m_game->camera->drawPoint(tilePosition.x, tilePosition.y, {80, 80, 80, 255});
-      m_game->camera->drawRect(tilePosition, m_tileSize, m_tileSize, {80, 80, 80, 255});
+      m_engine.camera->drawPoint(tilePosition.x, tilePosition.y, {80, 80, 80, 255});
+      m_engine.camera->drawRect(tilePosition, m_tileSize, m_tileSize, {80, 80, 80, 255});
     }
   }
 }
@@ -296,7 +249,7 @@ void World::drawGridTile(i32 xthChunk, i32 ythChunk)
 void World::drawGrid()
 {
 
-  Vec2i playerChunk = player->position.nthChunk;
+  Vec2i playerChunk = Vec2i::ZERO();
 
   // For each chunk
   for (i32 ythChunk = -m_renderDistance; ythChunk <= m_renderDistance; ++ythChunk)
@@ -314,14 +267,14 @@ void World::drawGrid()
       // Draw tiles inside chunk
       drawGridTile(renderChunk.x, renderChunk.y);
       // Draw the chunk
-      m_game->camera->drawRect(Vec2f((m_chunkSize / 2) + renderChunk.x * m_chunkSize,
-                                     ((m_chunkSize / 2) + renderChunk.y * m_chunkSize)),
-                               m_chunkSize, m_chunkSize, {0, 0, 255, 255});
+      m_engine.camera->drawRect(Vec2f((m_chunkSize / 2) + renderChunk.x * m_chunkSize,
+                                      ((m_chunkSize / 2) + renderChunk.y * m_chunkSize)),
+                                m_chunkSize, m_chunkSize, {0, 0, 255, 255});
     }
   }
 
   // Draw world borders;
-  m_game->camera->drawRect(m_origin + Vec2f(m_chunkSize * CHUNKS_DIM / 2, m_chunkSize * CHUNKS_DIM / 2), m_chunkSize * CHUNKS_DIM, m_chunkSize * CHUNKS_DIM, {255, 0, 0, 255});
+  m_engine.camera->drawRect(m_origin + Vec2f(m_chunkSize * CHUNKS_DIM / 2, m_chunkSize * CHUNKS_DIM / 2), m_chunkSize * CHUNKS_DIM, m_chunkSize * CHUNKS_DIM, {255, 0, 0, 255});
 }
 
 void World::drawChunk(Vec2i nthChunk)
@@ -353,7 +306,7 @@ void World::drawChunk(Chunk *chunk)
           biomeColor = {123, 63, 0, 255};
           break;
         }
-        m_game->camera->drawRect(tilePosition, m_tileSize, m_tileSize, biomeColor, true);
+        m_engine.camera->drawRect(tilePosition, m_tileSize, m_tileSize, biomeColor, true);
       }
     }
   }
@@ -365,18 +318,10 @@ void World::drawTile(Tile *tile)
   SDL_FRect srcRect = {4 * 16, 8 * 16, 16, 16};
 }
 
-void World::drawPlayer()
-{
-
-  SDL_FRect src = {0, 0, 32, 32};
-  m_game->camera->drawTexture(player->position.actualPosition, getTextureById(player->textureID), src,
-                              player->squareSize * 4, player->squareSize * 4, true);
-}
-
 void World::draw()
 {
   // Draw all the chunks in the render distance
-  Vec2i playerChunk = player->position.nthChunk;
+  Vec2i playerChunk = Vec2i::ZERO();
   for (int y = -m_renderDistance; y <= m_renderDistance; y++)
   {
     for (int x = -m_renderDistance; x <= m_renderDistance; x++)
@@ -391,5 +336,4 @@ void World::draw()
   }
 
   drawGrid();
-  drawPlayer();
 }

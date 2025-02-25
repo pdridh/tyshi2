@@ -3,6 +3,7 @@
 #include <SDL3/SDL.h>
 
 #include "Engine.h"
+#include "../utils/WorldPosition.h"
 
 #include <random>
 #include <algorithm>
@@ -21,22 +22,6 @@ struct Tile
   Vec2i position;
   Vec2i nthChunk;
   i32 atlasCode;
-};
-
-struct WorldPosition
-{
-  Vec2i nthChunk;
-  Vec2i nthTile;
-  Vec2f actualPosition;
-};
-
-// TODO Looks like the drawing stuff are related so maybe a Sprite struct?
-struct Player
-{
-  WorldPosition position;
-  f32 speed;
-  i32 squareSize = 24;
-  size_t textureID; // TODO idk how itll shape out but needs a texture fs
 };
 
 enum TileType
@@ -70,13 +55,13 @@ static size_t nextTextureId = 1;
 
 class World
 {
-private:
+public:
   u8 m_renderDistance;
   i32 m_chunkSize;
   i32 m_worldSize;
   i32 m_tileSize;
 
-  Engine *m_game;
+  Engine &m_engine;
 
   std::mt19937 gen;
   std::uniform_int_distribution<> biomeX;
@@ -87,36 +72,11 @@ private:
   BiomePoint biomePoints[NUMBER_OF_BIOME_PTS];
 
   Vec2f m_origin;
-  std::unordered_map<size_t, SDL_Texture *> textureMap;
-  Player *player;
 
 private:
 public:
-  World(Engine *game);
+  World(Engine &engine);
   ~World();
-
-  // TODO move these into some kind of resource loading thing idk
-  size_t loadTexture(const char *file)
-  {
-    SDL_Texture *texture = IMG_LoadTexture(m_game->m_renderer, file);
-    if (!texture)
-    {
-      SDL_Log("Failed to load texture: %s, Error: %s\n", file, SDL_GetError());
-      return -1;
-    }
-
-    size_t id = nextTextureId++;
-    textureMap[id] = texture;
-    return id;
-  }
-
-  SDL_Texture *getTextureById(size_t id)
-  {
-    auto it = textureMap.find(id);
-    assert(it != textureMap.end());
-
-    return it->second;
-  }
 
   // ***************************** Generation related stuff ****************** //
 
@@ -182,7 +142,6 @@ public:
 
   // **************************** Updating  stuff *******************//
 
-  void updatePlayer();
   void update();
 
   // **************************** Drawing stuff *******************//
@@ -196,6 +155,5 @@ public:
   // Draw a chunk given its ptr
   void drawChunk(Chunk *chunk);
   void drawTile(Tile *tile);
-  void drawPlayer();
   void draw();
 };
