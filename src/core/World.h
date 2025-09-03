@@ -4,7 +4,6 @@
 
 #include "Engine.h"
 #include "../utils/WorldPosition.h"
-#include "Player.h"
 
 #include <random>
 #include <algorithm>
@@ -73,7 +72,6 @@ public:
   BiomePoint biomePoints[NUMBER_OF_BIOME_PTS];
 
   Vec2f m_origin;
-  Player *player;
 
 private:
 public:
@@ -86,6 +84,8 @@ public:
   void generateChunkTiles(Chunk *chunky);
   Chunk *createChunk(Vec2i position);
   void generateWorld();
+
+  // Debug function, prints the biome points with their psoitions
   void printWorld();
 
   // **************************** Coordinate conversions *******************//
@@ -145,17 +145,4 @@ public:
   // **************************** Updating  stuff *******************//
 
   void update();
-
-  // **************************** Drawing stuff *******************//
-
-  void drawGridTile(i32 xthChunk, i32 ythChunk);
-  void drawGrid();
-
-  // Draw chunk based on its chunk position
-  void drawChunk(Vec2i nthChunk);
-
-  // Draw a chunk given its ptr
-  void drawChunk(Chunk *chunk);
-  void drawTile(Tile *tile);
-  void draw();
 };

@@ -15,9 +15,6 @@ World::World(Engine &engine)
 
   m_origin = Vec2f::ZERO();
 
-  player = new Player(*this, chunkTileToWorld(Vec2i(0, 2), Vec2i(0, 0)),
-                      m_engine.resourceManager->loadTexture("assets/char_walk.png"));
-
   generateWorld();
 }
 
@@ -114,7 +111,6 @@ void World::generateWorld()
 void World::printWorld()
 {
   // TODO also some way to store and retrieve THE WORLD SEEDD
-  // Prints the biome points with their psoitions
   for (auto &point : biomePoints)
   {
     point.position.print("Biome pt");
@@ -233,112 +229,4 @@ Tile *World::getTileFromChunk(Chunk *c, Vec2i nthTile)
 
 void World::update()
 {
-  player->update();
-}
-
-void World::drawGridTile(i32 xthChunk, i32 ythChunk)
-{
-  for (i32 ythTile = 0; ythTile < TILES_PER_CHUNK_DIM; ++ythTile)
-  {
-    for (i32 xthTile = 0; xthTile < TILES_PER_CHUNK_DIM; ++xthTile)
-    {
-      Vec2f tilePosition = chunkTileToActual(Vec2i(xthChunk, ythChunk), Vec2i(xthTile, ythTile));
-
-      m_engine.camera->drawPoint(tilePosition.x, tilePosition.y, {80, 80, 80, 255});
-      m_engine.camera->drawRect(tilePosition, m_tileSize, m_tileSize, {80, 80, 80, 255});
-    }
-  }
-}
-
-void World::drawGrid()
-{
-
-  Vec2i playerChunk = player->position.nthChunk;
-
-  // For each chunk
-  for (i32 ythChunk = -m_renderDistance; ythChunk <= m_renderDistance; ++ythChunk)
-  {
-    for (i32 xthChunk = -m_renderDistance; xthChunk <= m_renderDistance; ++xthChunk)
-    {
-      Vec2i renderChunk = playerChunk + Vec2i(xthChunk, ythChunk);
-
-      if (renderChunk.x >= CHUNKS_DIM ||
-          renderChunk.y >= CHUNKS_DIM ||
-          renderChunk.x < 0 ||
-          renderChunk.y < 0)
-        continue;
-
-      // Draw tiles inside chunk
-      drawGridTile(renderChunk.x, renderChunk.y);
-      // Draw the chunk
-      m_engine.camera->drawRect(Vec2f((m_chunkSize / 2) + renderChunk.x * m_chunkSize,
-                                      ((m_chunkSize / 2) + renderChunk.y * m_chunkSize)),
-                                m_chunkSize, m_chunkSize, {0, 0, 255, 255});
-    }
-  }
-
-  // Draw world borders;
-  m_engine.camera->drawRect(m_origin + Vec2f(m_chunkSize * CHUNKS_DIM / 2, m_chunkSize * CHUNKS_DIM / 2), m_chunkSize * CHUNKS_DIM, m_chunkSize * CHUNKS_DIM, {255, 0, 0, 255});
-}
-
-void World::drawChunk(Vec2i nthChunk)
-{
-  Chunk *&chunky = getChunk(nthChunk);
-  drawChunk(chunky);
-}
-
-void World::drawChunk(Chunk *chunk)
-{
-  for (i32 ythTile = 0; ythTile < TILES_PER_CHUNK_DIM; ++ythTile)
-  {
-    for (i32 xthTile = 0; xthTile < TILES_PER_CHUNK_DIM; ++xthTile)
-    {
-      Tile *tile = getTileFromChunk(chunk, Vec2i(xthTile, ythTile));
-      if (tile)
-      {
-        Vec2f tilePosition = chunkTileToActual(tile->nthChunk, tile->position);
-        Color biomeColor;
-        switch (chunk->biome)
-        {
-        case Biome::Grassland:
-          biomeColor = {0, 255, 0, 255};
-          break;
-        case Biome::Forest:
-          biomeColor = {0, 128, 12, 255};
-          break;
-        case Biome::Rocky:
-          biomeColor = {123, 63, 0, 255};
-          break;
-        }
-        m_engine.camera->drawRect(tilePosition, m_tileSize, m_tileSize, biomeColor, true);
-      }
-    }
-  }
-}
-
-void World::drawTile(Tile *tile)
-{
-  Vec2f tilePosition = chunkTileToActual(tile->nthChunk, tile->position);
-  SDL_FRect srcRect = {4 * 16, 8 * 16, 16, 16};
-}
-
-void World::draw()
-{
-  // Draw all the chunks in the render distance
-  Vec2i playerChunk = player->position.nthChunk;
-  for (int y = -m_renderDistance; y <= m_renderDistance; y++)
-  {
-    for (int x = -m_renderDistance; x <= m_renderDistance; x++)
-    {
-      Vec2i renderChunk = playerChunk + Vec2i(x, y);
-
-      if (renderChunk.x >= CHUNKS_DIM || renderChunk.y >= CHUNKS_DIM || renderChunk.x < 0 || renderChunk.y < 0)
-        continue;
-
-      drawChunk(renderChunk);
-    }
-  }
-
-  drawGrid();
-  player->draw();
 }
