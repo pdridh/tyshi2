@@ -42,9 +42,7 @@ public:
 
   void changeState(State<EntityType> *newState)
   {
-    printf("Changing state\n");
     assert(newState && "changing to null state");
-    printf("assertion valid\n");
 
     previousState = currentState;
 

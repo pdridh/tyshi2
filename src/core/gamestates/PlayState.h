@@ -1,11 +1,13 @@
 #pragma once
 
 #include "GameState.h"
+#include "../ecs/EntityManager.h"
 #include "../World.h"
 
 class PlayState : public GameState
 {
 private:
+  EntityManager *entityManager = nullptr;
   static PlayState m_self;
   PlayState() {}
   World *world;

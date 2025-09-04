@@ -55,7 +55,7 @@ public:
   SDL_Renderer *m_renderer;
 
   GameMemory m_memory;
-  Input input;
+  Input *input;
   Camera *camera;
   ResourceManager *resourceManager;
 

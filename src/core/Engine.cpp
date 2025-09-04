@@ -70,6 +70,7 @@ bool Engine::init(const std::string &title)
   m_memory.persistentStorage = allocateMemory(m_memory.persistentStorageSize);
   m_memory.transientStorage = allocateMemory(m_memory.transientStorageSize);
 
+  input = new Input();
   resourceManager = new ResourceManager(*this);
   camera = new Camera(m_renderer, m_screenWidth, m_screenHeight);
 
@@ -99,7 +100,7 @@ void Engine::processInput()
   // Process events
   SDL_Event event;
 
-  input.reset();
+  input->reset();
 
   while (SDL_PollEvent(&event))
   {
@@ -109,20 +110,20 @@ void Engine::processInput()
       m_running = false;
       break;
     case SDL_EVENT_KEY_DOWN:
-      input.handleKeyButtonDown(event.key);
+      input->handleKeyButtonDown(event.key);
       break;
     case SDL_EVENT_KEY_UP:
-      input.handleKeyButtonUp(event.key);
+      input->handleKeyButtonUp(event.key);
       break;
     case SDL_EVENT_MOUSE_WHEEL:
       // event
-      input.handleMouseWheel(event.wheel);
+      input->handleMouseWheel(event.wheel);
       break;
     case SDL_EVENT_MOUSE_BUTTON_UP:
-      input.handleMouseButtonUp(event.button);
+      input->handleMouseButtonUp(event.button);
       break;
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
-      input.handleMouseButtonDown(event.button);
+      input->handleMouseButtonDown(event.button);
       break;
     case SDL_EVENT_WINDOW_RESIZED:
       handleScreenResizeEvent();
@@ -131,7 +132,7 @@ void Engine::processInput()
       break;
     }
   }
-  input.updateKeyboardState();
+  input->updateKeyboardState();
 }
 
 void Engine::changeState(GameState *state)

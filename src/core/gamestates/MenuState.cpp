@@ -28,11 +28,11 @@ void MenuState::resume(Engine &engine)
 
 void MenuState::update(Engine &engine)
 {
-  if (engine.input.isKeyDownFrame(SDL_SCANCODE_ESCAPE))
+  if (engine.input->isKeyDownFrame(SDL_SCANCODE_ESCAPE))
   {
     engine.quit();
   }
-  else if (engine.input.isKeyDownFrame(SDL_SCANCODE_SPACE))
+  else if (engine.input->isKeyDownFrame(SDL_SCANCODE_SPACE))
   {
     engine.changeState(PlayState::instance());
   }
